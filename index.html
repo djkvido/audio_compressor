@@ -316,60 +316,60 @@
             </div>
 
             <div id="compareTab">
-                <div class="comparison-grid">
-                    <div class="compare-container">
-                        <div
-                            style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
-                            <h4 style="margin: 0; color: var(--warning);">⚠️ <span data-i18n="original">Originál</span>
-                            </h4>
-                            <button class="nav-btn small" onclick="togglePlayback('original')" title="Přehrát originál">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                                    fill="currentColor" id="playIconOriginalComp">
-                                    <path fill-rule="evenodd"
-                                        d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="waveform-container" onclick="togglePlayback('original')" style="cursor: pointer;">
-                            <canvas class="waveform-canvas" id="compareOriginalWaveform"></canvas>
-                        </div>
-                        <p style="font-size: 0.8rem; color: var(--text-dim); margin-top: 0.5rem; text-align: center;"
-                            id="originalStats"></p>
+                <!-- Original Section -->
+                <div class="compare-container">
+                    <div
+                        style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+                        <h4 style="margin: 0; color: var(--warning);">⚠️ <span data-i18n="original">Originál</span>
+                        </h4>
+                        <button class="nav-btn small" onclick="togglePlayback('original')" title="Přehrát originál">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                fill="currentColor" id="playIconOriginalComp">
+                                <path fill-rule="evenodd"
+                                    d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </button>
                     </div>
-                    <div class="compare-container">
-                        <div
-                            style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
-                            <h4 style="margin: 0; color: var(--accent);">✅ <span data-i18n="processed">Upraveno</span>
-                            </h4>
-                            <button class="nav-btn small" onclick="togglePlayback('processed')"
-                                title="Přehrát upravené">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                                    fill="currentColor" id="playIconProcessedComp">
-                                    <path fill-rule="evenodd"
-                                        d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="waveform-container" onclick="togglePlayback('processed')" style="cursor: pointer;">
-                            <canvas class="waveform-canvas" id="compareProcessedWaveform"></canvas>
-                        </div>
-                        <p style="font-size: 0.8rem; color: var(--text-dim); margin-top: 0.5rem; text-align: center;"
-                            id="processedStats"></p>
+                    <div class="waveform-container" onclick="togglePlayback('original')" style="cursor: pointer;">
+                        <canvas class="waveform-canvas" id="compareOriginalWaveform"></canvas>
                     </div>
+                    <p style="font-size: 0.8rem; color: var(--text-dim); margin-top: 0.5rem; text-align: center;"
+                        id="originalStats"></p>
                 </div>
-            </div>
 
-            <!-- A/B Toggle Button -->
-            <div class="ab-toggle-container">
-                <button class="ab-toggle" id="abToggle"
-                    title="Přepnout mezi originál a upravenou verzí (stiskni během přehrávání)">
-                    <span class="ab-label ab-a active">A</span>
-                    <span class="ab-divider">|</span>
-                    <span class="ab-label ab-b">B</span>
-                </button>
-                <span class="ab-hint" data-i18n="abHint">Klikni pro přepnutí Originál ↔ Upraveno</span>
+                <!-- A/B Toggle Button (Middle) -->
+                <div class="ab-toggle-container">
+                    <button class="ab-toggle" id="abToggle"
+                        title="Přepnout mezi originál a upravenou verzí (stiskni během přehrávání)">
+                        <span class="ab-label ab-a active">A</span>
+                        <span class="ab-divider">|</span>
+                        <span class="ab-label ab-b">B</span>
+                    </button>
+                    <span class="ab-hint" data-i18n="abHint">Klikni pro přepnutí Originál ↔ Upraveno</span>
+                </div>
+
+                <!-- Processed Section -->
+                <div class="compare-container">
+                    <div
+                        style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+                        <h4 style="margin: 0; color: var(--accent);">✅ <span data-i18n="processed">Upraveno</span>
+                        </h4>
+                        <button class="nav-btn small" onclick="togglePlayback('processed')" title="Přehrát upravené">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                fill="currentColor" id="playIconProcessedComp">
+                                <path fill-rule="evenodd"
+                                    d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="waveform-container" onclick="togglePlayback('processed')" style="cursor: pointer;">
+                        <canvas class="waveform-canvas" id="compareProcessedWaveform"></canvas>
+                    </div>
+                    <p style="font-size: 0.8rem; color: var(--text-dim); margin-top: 0.5rem; text-align: center;"
+                        id="processedStats"></p>
+                </div>
             </div>
 
             <div class="actions">
