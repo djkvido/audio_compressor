@@ -327,9 +327,9 @@ function applyTruePeakLimiter(channels, length, sampleRate, ceilingDb) {
             // --- Soft Clipper (Soft Knee) ---
             // Místo tvrdého oříznutí (hard clip) použijeme saturaci (tanh).
             // Když se signál blíží ke stropu, jemně ho zaoblíme.
-            // Knee začíná 1.5 dB pod stropem.
+            // Knee začíná 6.0 dB pod stropem.
 
-            const kneeDb = ceilingDb - 1.5;
+            const kneeDb = ceilingDb - 6.0;
             const threshold = Math.pow(10, kneeDb / 20);
 
             if (val > threshold) {
