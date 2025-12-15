@@ -1,7 +1,6 @@
-// Taháme sem LAMEjs encoder, protože browser neumí MP3 nativně exportovat
 importScripts('https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js');
 
-// Tady posloucháme, co po nás chce hlavní vlákno (Main Thread)
+// Main Thread Listener
 self.onmessage = async function (e) {
     const data = e.data;
 
@@ -23,7 +22,7 @@ self.onmessage = async function (e) {
     }
 };
 
-// --- Heavy lifting: Analýza audia (běží to tady, aby se nesekalo GUI) ---
+// --- Audio Analysis ---
 function analyzeAudio(channels, sampleRate, length) {
     const channelData = channels[0]; // Pro analýzu stačí jeden kanál (mono)
 
@@ -115,7 +114,6 @@ function analyzeAudio(channels, sampleRate, length) {
     };
 }
 
-// --- Tady se děje ta magie úpravy zvuku ---
 async function processAudio(channels, sampleRate, length, settings) {
     // Pomocná funkce pro hlášení postupu
     const reportProgress = (percent, text) => {
@@ -167,7 +165,7 @@ async function processAudio(channels, sampleRate, length, settings) {
     });
 }
 
-// ================= EFEKTY - JÁDRO PUDLA =================
+// ================= EFFECTS =================
 
 // High-Pass Filter (Biquad - 20Hz, Q=0.707 Butterworth)
 // Jednoduchý IIR filtr (Infinite Impulse Response)

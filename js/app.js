@@ -322,87 +322,97 @@ function handlePresetChange() {
 }
 
 // A/B Testování - aby si uživatel mohl rychle porovnat změnu (při přehrávání)
-let currentAB = 'processed';
+// A/B Testování - aby si uživatel mohl rychle porovnat změnu (při přehrávání)
+let currentAB = 'original'; // Výchozí stav (shoduje se s HTML)
 
-function handleABToggle() {
+function updateABVisuals(type) {
     const aLabel = document.querySelector('.ab-a');
     const bLabel = document.querySelector('.ab-b');
 
+    // Safety check
+    if (!aLabel || !bLabel) return;
+
+    if (type === 'original') {
+        aLabel.classList.add('active');
+        bLabel.classList.remove('active');
+    } else {
+        aLabel.classList.remove('active');
+        bLabel.classList.add('active');
+    }
+    currentAB = type;
+}
+
+function handleABToggle() {
     const originalPlaying = audioElements.original && !audioElements.original.paused;
     const processedPlaying = audioElements.processed && !audioElements.processed.paused;
 
-    let currentTime = 0;
+    // Logika přepnutí:
+    // 1. Pokud hraje A -> přepni na B
+    // 2. Pokud hraje B -> přepni na A
+    // 3. Pokud nehraje nic -> přepni stav (visual) na ten druhý, než je teď
+
     if (originalPlaying) {
-        currentTime = audioElements.original.currentTime;
+        // Hraje originál -> přepnout na upravené
+        switchToAudio('processed', audioElements.original.currentTime);
     } else if (processedPlaying) {
-        currentTime = audioElements.processed.currentTime;
-    }
-
-    if (currentAB === 'processed') {
-        // Přepnout na A (originál)
-        currentAB = 'original';
-        aLabel.classList.add('active');
-        bLabel.classList.remove('active');
-
-        if (processedPlaying) {
-            audioElements.processed.pause();
-            updatePlayIcon('processed', false);
-            clearInterval(playbackIntervals.processed);
-            clearAllWaveformPlayheads('processed');
-
-            if (!audioElements.original) {
-                audioElements.original = new Audio(URL.createObjectURL(state.originalFile));
-                audioElements.original.addEventListener('ended', () => {
-                    updatePlayIcon('original', false);
-                    clearInterval(playbackIntervals.original);
-                    clearAllWaveformPlayheads('original');
-                });
-            }
-            audioElements.original.currentTime = currentTime;
-            audioElements.original.play();
-            updatePlayIcon('original', true);
-
-            playbackIntervals.original = setInterval(() => {
-                const audio = audioElements.original;
-                const ratio = audio.currentTime / audio.duration;
-                updateProgress('original', ratio);
-                updateTimeDisplay('original', audio.currentTime, audio.duration);
-                updateAllWaveformPlayheads('original', ratio);
-            }, 50);
-        }
+        // Hraje upravené -> přepnout na originál
+        switchToAudio('original', audioElements.processed.currentTime);
     } else {
-        // Přepnout na B (upravené)
-        currentAB = 'processed';
-        aLabel.classList.remove('active');
-        bLabel.classList.add('active');
-
-        if (originalPlaying) {
-            audioElements.original.pause();
-            updatePlayIcon('original', false);
-            clearInterval(playbackIntervals.original);
-            clearAllWaveformPlayheads('original');
-
-            if (!audioElements.processed) {
-                audioElements.processed = new Audio(URL.createObjectURL(state.processedBlob));
-                audioElements.processed.addEventListener('ended', () => {
-                    updatePlayIcon('processed', false);
-                    clearInterval(playbackIntervals.processed);
-                    clearAllWaveformPlayheads('processed');
-                });
-            }
-            audioElements.processed.currentTime = currentTime;
-            audioElements.processed.play();
-            updatePlayIcon('processed', true);
-
-            playbackIntervals.processed = setInterval(() => {
-                const audio = audioElements.processed;
-                const ratio = audio.currentTime / audio.duration;
-                updateProgress('processed', ratio);
-                updateTimeDisplay('processed', audio.currentTime, audio.duration);
-                updateAllWaveformPlayheads('processed', ratio);
-            }, 50);
-        }
+        // Nic nehraje - jen přepneme "přepínač"
+        const newType = currentAB === 'original' ? 'processed' : 'original';
+        updateABVisuals(newType);
     }
+}
+
+// Pomocná funkce pro A/B přepnutí za běhu
+function switchToAudio(targetType, currentTime) {
+    const sourceType = targetType === 'original' ? 'processed' : 'original';
+
+    // 1. Stopnout současné
+    if (audioElements[sourceType]) {
+        audioElements[sourceType].pause();
+        updatePlayIcon(sourceType, false);
+        clearInterval(playbackIntervals[sourceType]);
+        clearAllWaveformPlayheads(sourceType);
+    }
+
+    // 2. Spustit cílové
+    if (!audioElements[targetType]) {
+        if (targetType === 'original' && state.originalFile) {
+            audioElements[targetType] = new Audio(URL.createObjectURL(state.originalFile));
+        } else if (targetType === 'processed' && state.processedBlob) {
+            audioElements[targetType] = new Audio(URL.createObjectURL(state.processedBlob));
+        } else {
+            return; // Není co přehrát
+        }
+
+        // Setup event listenerů (jen jednou)
+        audioElements[targetType].addEventListener('ended', () => {
+            updatePlayIcon(targetType, false);
+            clearInterval(playbackIntervals[targetType]);
+            updateProgress(targetType, 0);
+            clearAllWaveformPlayheads(targetType);
+        });
+    }
+
+    const audio = audioElements[targetType];
+    audio.currentTime = currentTime;
+    audio.play().then(() => {
+        updatePlayIcon(targetType, true);
+
+        // Interval pro update UI
+        if (playbackIntervals[targetType]) clearInterval(playbackIntervals[targetType]);
+        playbackIntervals[targetType] = setInterval(() => {
+            const ratio = audio.currentTime / audio.duration;
+            updateProgress(targetType, ratio);
+            updateTimeDisplay(targetType, audio.currentTime, audio.duration);
+            updateAllWaveformPlayheads(targetType, ratio);
+        }, 50);
+
+        // Aktualizace vizuálu tlačítka
+        updateABVisuals(targetType);
+
+    }).catch(err => console.error("Playback failed:", err));
 }
 
 function redrawWaveformsForTab(tabName) {
@@ -668,21 +678,26 @@ function togglePlayback(type) {
     const audio = audioElements[type];
 
     if (audio.paused) {
-        audio.play();
-        updatePlayIcon(type, true);
+        // Pokud startujeme přehrávání, chceme aby se A/B button aktualizoval podle toho, co hraje
+        updateABVisuals(type);
 
-        playbackIntervals[type] = setInterval(() => {
-            const ratio = audio.currentTime / audio.duration;
-            updateProgress(type, ratio);
-            updateTimeDisplay(type, audio.currentTime, audio.duration);
-            updateAllWaveformPlayheads(type, ratio);
-        }, 50);
+        audio.play().then(() => {
+            updatePlayIcon(type, true);
+            playbackIntervals[type] = setInterval(() => {
+                const ratio = audio.currentTime / audio.duration;
+                updateProgress(type, ratio);
+                updateTimeDisplay(type, audio.currentTime, audio.duration);
+                updateAllWaveformPlayheads(type, ratio);
+            }, 50);
+        }).catch(e => console.error("Play error:", e));
+
     } else {
         audio.pause();
         updatePlayIcon(type, false);
         clearInterval(playbackIntervals[type]);
     }
 }
+
 // Expose to global scope for onclick handlers in HTML
 window.togglePlayback = togglePlayback;
 

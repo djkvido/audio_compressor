@@ -8,7 +8,6 @@ function getSettings() {
     const enableNormalize = $('enableNormalize').checked;
     const enableFadeIn = $('enableFadeIn').checked;
     const enableFadeOut = $('enableFadeOut').checked;
-    // EQ letěl do koše. User chtěl jen "One Click" magic.
 
     // Hodnoty pro fade
     const fadeInInput = $('fadeInTime').value;
