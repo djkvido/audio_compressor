@@ -1,0 +1,10 @@
+# Python Virtual Env
+venv/
+.venv/
+env/
+.env
+
+# System
+.DS_Store
+__pycache__/
+*.pyc
