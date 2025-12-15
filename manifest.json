@@ -1,13 +1,23 @@
 {
-    "name": "Audio Compressor",
-    "short_name": "AudioCompressor",
+    "name": "Audio Compressor Studio",
+    "short_name": "AudioStudio",
+    "description": "Professional Audio Compression & Analysis Tool",
     "start_url": "./index.html",
+    "id": "/",
+    "scope": "./",
     "display": "standalone",
+    "orientation": "portrait",
     "background_color": "#0f172a",
     "theme_color": "#0f172a",
     "icons": [
         {
-            "src": "https://cdn-icons-png.flaticon.com/512/3075/3075908.png",
+            "src": "assets/icon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "assets/icon-512.png",
             "sizes": "512x512",
             "type": "image/png"
         }

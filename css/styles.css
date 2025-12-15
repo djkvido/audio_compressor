@@ -57,6 +57,12 @@ body {
     background: var(--bg-base);
     color: var(--text-primary);
     min-height: 100vh;
+    /* Safe Area Insets for Mobile */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     position: relative;

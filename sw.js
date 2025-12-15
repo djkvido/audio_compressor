@@ -1,4 +1,4 @@
-const CACHE_NAME = 'audio-studio-v7';
+const CACHE_NAME = 'audio-studio-v8';
 const ASSETS = [
     './',
     './index.html',
