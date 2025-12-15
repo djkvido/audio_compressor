@@ -124,19 +124,22 @@ async function processAudio(channels, sampleRate, length, settings) {
 
     await reportProgress(5, 'Příprava...');
 
-    // 1. Smart Leveler - srovná hlasitost, ale opatrně (Protect the Drop!)
+    // 0. High-Pass Filter (20Hz) - První věc: Vyčistíme bordel dole (DC offset, rumble)
+    // Děláme to před jakoukoliv analýzou, protože ten bordel by nám zkresloval měření RMS.
+    await reportProgress(10, 'Čistím sub-basy (HPF 20Hz)...');
+    applyHighPassFilter(channels, length, sampleRate);
+
+    // 1. Smart Leveler - srovná hlasitost (pracuje už s čistým zvukem)
     if (settings.enableNormalize) {
         await reportProgress(20, 'Analyzuji dynamiku...');
         applySmartLeveler(channels, length, sampleRate, settings);
     }
 
-    // (EQ letěl pryč, bylo to zbytečně složité)
-
-    // 2. Limiter - aby to nešlo do červených a nechrčelo to
+    // 2. Limiter - ošetří špičky (nyní Soft Clipper 6dB knee)
     await reportProgress(60, 'Omezuji špičky...');
     applyTruePeakLimiter(channels, length, sampleRate, settings.ceiling);
 
-    // 3. Fady na začátek a konec, ať to neusekne uši
+    // 3. Fady
     if (settings.enableFadeIn && settings.fadeInTime > 0) {
         await reportProgress(70, 'Aplikuji Fade In...');
         applyFadeIn(channels, length, sampleRate, settings.fadeInTime);
@@ -146,20 +149,15 @@ async function processAudio(channels, sampleRate, length, settings) {
         applyFadeOut(channels, length, sampleRate, settings.fadeOutTime);
     }
 
-    // 4. Finální render do souboru
-    await reportProgress(80, settings.exportFormat === 'wav' ? "Exportuji WAV..." : "Enkóduji MP3...");
+    // 4. Finální render - VŽDY MP3
+    await reportProgress(80, "Enkóduji MP3...");
 
-    // Ještě jednou to projedeme analýzou, ať vidíme výsledek v grafech (před enkódováním)
+    // Analýza výsledku
     const processedAnalysis = analyzeAudio(channels, sampleRate, length);
 
-    let finalBlob;
-    if (settings.exportFormat === 'wav') {
-        finalBlob = encodeWAV(channels, length, sampleRate);
-    } else {
-        finalBlob = await encodeMP3(channels, length, sampleRate, (p) => {
-            reportProgress(80 + p * 18, 'Enkóduji MP3...');
-        });
-    }
+    const finalBlob = await encodeMP3(channels, length, sampleRate, (p) => {
+        reportProgress(80 + p * 18, 'Enkóduji MP3...');
+    });
 
     self.postMessage({
         type: 'complete',
@@ -170,6 +168,51 @@ async function processAudio(channels, sampleRate, length, settings) {
 }
 
 // ================= EFEKTY - JÁDRO PUDLA =================
+
+// High-Pass Filter (Biquad - 20Hz, Q=0.707 Butterworth)
+// Jednoduchý IIR filtr (Infinite Impulse Response)
+function applyHighPassFilter(channels, length, sampleRate) {
+    const numChannels = channels.length;
+    const frequency = 20; // Řežeme vše pod 20Hz
+    const Q = 0.707; // Butterworth (maximálně rovná charakteristika)
+
+    // Výpočet koeficientů (podle Audio EQ Cookbook)
+    const omega = 2 * Math.PI * frequency / sampleRate;
+    const alpha = Math.sin(omega) / (2 * Q);
+    const cos = Math.cos(omega);
+
+    const a0 = 1 + alpha;
+    const b0 = (1 + cos) / 2;
+    const b1 = -(1 + cos);
+    const b2 = (1 + cos) / 2;
+    const a1 = -2 * cos;
+    const a2 = 1 - alpha;
+
+    // Normalizace koeficientů (aby a0 bylo 1)
+    const b0_n = b0 / a0;
+    const b1_n = b1 / a0;
+    const b2_n = b2 / a0;
+    const a1_n = a1 / a0;
+    const a2_n = a2 / a0;
+
+    for (let ch = 0; ch < numChannels; ch++) {
+        const data = channels[ch];
+        let x1 = 0, x2 = 0, y1 = 0, y2 = 0;
+
+        for (let i = 0; i < length; i++) {
+            const x0 = data[i];
+            const y0 = b0_n * x0 + b1_n * x1 + b2_n * x2 - a1_n * y1 - a2_n * y2;
+
+            data[i] = y0;
+
+            // Posun zpoždění
+            x2 = x1;
+            x1 = x0;
+            y2 = y1;
+            y1 = y0;
+        }
+    }
+}
 
 // Smart Leveler (2-fázové AGC) - tohle je ten chytrý algoritmus co "chrání dropy"
 function applySmartLeveler(channels, length, sampleRate, settings) {
@@ -383,45 +426,6 @@ function applyFadeOut(channels, length, sampleRate, fadeOutTime) {
     }
 }
 
-// Klasický WAV header - nudná administrativa
-function encodeWAV(channels, length, sampleRate) {
-    const numChannels = channels.length;
-    const left = channels[0];
-    const right = numChannels > 1 ? channels[1] : left;
-
-    const buffer = new ArrayBuffer(44 + length * numChannels * 2);
-    const view = new DataView(buffer);
-
-    const writeString = (view, offset, string) => {
-        for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i));
-    };
-
-    writeString(view, 0, 'RIFF');
-    view.setUint32(4, 36 + length * numChannels * 2, true);
-    writeString(view, 8, 'WAVE');
-    writeString(view, 12, 'fmt ');
-    view.setUint32(16, 16, true);
-    view.setUint16(20, 1, true);
-    view.setUint16(22, numChannels, true);
-    view.setUint32(24, sampleRate, true);
-    view.setUint32(28, sampleRate * numChannels * 2, true);
-    view.setUint16(32, numChannels * 2, true);
-    view.setUint16(34, 16, true);
-    writeString(view, 36, 'data');
-    view.setUint32(40, length * numChannels * 2, true);
-
-    let offset = 44;
-    for (let i = 0; i < length; i++) {
-        for (let ch = 0; ch < numChannels; ch++) {
-            let sample = ch === 0 ? left[i] : right[i];
-            sample = Math.max(-1, Math.min(1, sample));
-            sample = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
-            view.setInt16(offset, sample, true);
-            offset += 2;
-        }
-    }
-    return new Blob([view], { type: 'audio/wav' });
-}
 
 // Export do MP3
 async function encodeMP3(channels, length, sampleRate, onProgress) {

@@ -22,9 +22,6 @@ function getSettings() {
     const windowSizeInput = $('windowSize');
     const ceilingInput = $('limiterCeiling');
 
-    // Export formát
-    const exportFormat = $('exportFormat') ? $('exportFormat').value : 'mp3';
-
     return {
         enableNormalize,
         enableFadeIn,
@@ -36,9 +33,7 @@ function getSettings() {
         maxBoost: maxBoostInput ? parseFloat(maxBoostInput.value) : 20,
         windowSize: windowSizeInput ? parseFloat(windowSizeInput.value) : 500,
         // Limiter
-        ceiling: ceilingInput ? parseFloat(ceilingInput.value) : -1,
-        // Formát
-        exportFormat
+        ceiling: ceilingInput ? parseFloat(ceilingInput.value) : -1
     };
 }
 
