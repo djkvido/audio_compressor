@@ -323,8 +323,29 @@ function applyTruePeakLimiter(channels, length, sampleRate, ceilingDb) {
 
         for (let ch = 0; ch < numChannels; ch++) {
             let val = channels[ch][i] * currentGain;
+
+            // --- Soft Clipper (Soft Knee) ---
+            // Místo tvrdého oříznutí (hard clip) použijeme saturaci (tanh).
+            // Když se signál blíží ke stropu, jemně ho zaoblíme.
+            // Knee začíná 1.5 dB pod stropem.
+
+            const kneeDb = ceilingDb - 1.5;
+            const threshold = Math.pow(10, kneeDb / 20);
+
+            if (val > threshold) {
+                const overdrive = val - threshold;
+                const headroom = ceiling - threshold;
+                val = threshold + headroom * Math.tanh(overdrive / headroom);
+            } else if (val < -threshold) {
+                const overdrive = (-val) - threshold;
+                const headroom = ceiling - threshold;
+                val = -(threshold + headroom * Math.tanh(overdrive / headroom));
+            }
+
+            // Sichr - i kdyby matematika selhala, nepustíme to přes absolute ceiling
             if (val > ceiling) val = ceiling;
             if (val < -ceiling) val = -ceiling;
+
             channels[ch][i] = val;
         }
     }
