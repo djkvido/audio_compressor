@@ -484,13 +484,53 @@
         </div>
         <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
             <p><span data-i18n="footerText">Zpracování probíhá v prohlížeči, soubory se nikam neodesílají</span></p>
-            <button id="hardResetBtn"
+            <button id="hardResetBtn" onclick="hardResetApp()"
                 style="background: none; border: none; color: var(--text-tertiary); font-size: 0.7rem; cursor: pointer; text-decoration: underline; padding: 0.2rem;"
-                title="Vymazat cache a aktualizovat aplikaci (v9.0)">
-                ↻ Reset Cache & Reload (v9.0)
+                title="Vymazat cache a aktualizovat aplikaci">
+                ↻ Reset Cache & Reload (Force)
             </button>
         </div>
     </footer>
+
+    <!-- Inline Fix for Caching Issues -->
+    <script>
+        async function hardResetApp() {
+            if (!confirm('Opravdu resetovat celou aplikaci? Vymaže se cache a provede se tvrdý reload.')) return;
+
+            const btn = document.getElementById('hardResetBtn');
+            btn.textContent = 'Resetování...';
+            btn.style.color = 'var(--accent)';
+
+            try {
+                // 1. Kill Service Workers
+                if ('serviceWorker' in navigator) {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    for (const registration of registrations) {
+                        await registration.unregister();
+                    }
+                }
+
+                // 2. Clear All Caches
+                if ('caches' in window) {
+                    const keys = await caches.keys();
+                    await Promise.all(keys.map(key => caches.delete(key)));
+                }
+
+                // 3. Clear LocalStorage
+                localStorage.clear();
+
+                alert('Hotovo. Aplikace se nyní restartuje.');
+
+                // 4. Force Reload
+                window.location.reload(true);
+                window.location.href = window.location.href; // Double force
+
+            } catch (err) {
+                alert('Chyba: ' + err.message);
+                window.location.reload();
+            }
+        }
+    </script>
 
     <!-- lamejs for MP3 encoding -->
     <script src="https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js"></script>

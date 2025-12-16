@@ -231,33 +231,7 @@ function setupEventListeners() {
     const langBtn = $('langBtn');
     const langMenu = $('langMenu');
 
-    // Hard Reset Logic
-    const hardResetBtn = $('hardResetBtn');
-    if (hardResetBtn) {
-        hardResetBtn.addEventListener('click', async () => {
-            if (!confirm('Opravdu chceš vymazat cache a restartovat aplikaci?')) return;
 
-            try {
-                // 1. Unregister SW
-                if ('serviceWorker' in navigator) {
-                    const registrations = await navigator.serviceWorker.getRegistrations();
-                    for (const registration of registrations) {
-                        await registration.unregister();
-                    }
-                }
-
-                // 2. Clear Caches
-                const keys = await caches.keys();
-                await Promise.all(keys.map(key => caches.delete(key)));
-
-                // 3. Reload
-                window.location.reload(true);
-            } catch (err) {
-                alert("Chyba při resetu: " + err.message);
-                window.location.reload();
-            }
-        });
-    }
 
     if (langBtn && langMenu) {
         langBtn.addEventListener('click', (e) => {
