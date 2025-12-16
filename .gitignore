@@ -8,3 +8,9 @@ env/
 .DS_Store
 __pycache__/
 *.pyc
+
+# Backups/Archives
+bck/
+*.rar
+*.zip
+*.7z
