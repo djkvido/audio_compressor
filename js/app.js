@@ -527,6 +527,9 @@ async function handleSingleFile(file) {
     uploadHint.classList.add('hidden');
     fileInfo.classList.remove('hidden');
 
+    const promoCard = document.querySelector('.feature-promo-card');
+    if (promoCard) promoCard.classList.add('hidden');
+
     if (batchListCard) batchListCard.classList.add('hidden');
     if (batchProcessActions) batchProcessActions.classList.add('hidden');
 
@@ -544,6 +547,9 @@ function handleBatchFiles(files) {
 
     uploadZone.classList.add('hidden');
     uploadHint.classList.add('hidden');
+
+    const promoCard = document.querySelector('.feature-promo-card');
+    if (promoCard) promoCard.classList.add('hidden');
 
     settingsCard.classList.remove('hidden');
 
@@ -907,6 +913,9 @@ function resetApp() {
     uploadHint.classList.remove('hidden');
     fileInfo.classList.add('hidden');
 
+    const promoCard = document.querySelector('.feature-promo-card');
+    if (promoCard) promoCard.classList.remove('hidden');
+
     analysisCard.classList.add('hidden');
     settingsCard.classList.add('hidden');
     resultCard.classList.add('hidden');
@@ -939,13 +948,8 @@ export { init };
 // A konečně to celé nahodíme, až je DOM připravený
 document.addEventListener('DOMContentLoaded', init);
 
-// Pojistka proti nechtěnému zavření záložky, když je rozdělaná práce
-window.addEventListener('beforeunload', (e) => {
-    if (state.originalFile) {
-        e.preventDefault();
-        e.returnValue = '';
-    }
-});
+// Pojistka proti nechtěnému zavření odstraněna na žádost uživatele
+// window.addEventListener('beforeunload', ...);
 
 // Univerzální potvrzovací/varovné okno (aby to nevypadalo hnusně jako systémový alert)
 function showWarningModal(confirmCallback, titleKey = 'warningTitle', bodyKey = 'warningBody') {

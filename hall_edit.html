@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="cs">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time-Stretch Studio | DJKvido</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="assets/icon.svg">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <header class="app-header">
+            <h1 class="app-title" data-i18n="appTitleHall">Time-Stretch</h1>
+        </header>
+        <!-- Upload Section -->
+        <div class="upload-zone" id="uploadZone">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M9 8.25H7.5a2.25 2.25 0 0 0-2.25 2.25v9a2.25 2.25 0 0 0 2.25 2.25h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25H15m0-3-3-3m0 0-3 3m3-3V15" />
+            </svg>
+            <h3 data-i18n="uploadTitle">Přetáhni sem audio soubor</h3>
+            <p><span data-i18n="uploadOr">nebo</span> <span data-i18n="uploadBrowse">klikni pro výběr</span> • <span
+                    data-i18n="uploadFormats">MP3, WAV, M4A, OGG, FLAC</span></p>
+            <input type="file" id="fileInput" accept="audio/*">
+        </div>
+
+        <!-- Feature Promo Card (Back to Main) -->
+        <a href="index.html" class="feature-promo-card">
+            <div class="promo-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                </svg>
+            </div>
+            <div class="promo-content">
+                <h3 data-i18n="promoBackTitle">Profesionální analýza a normalizace audia</h3>
+            </div>
+            <div class="promo-action">
+                <span data-i18n="promoBackBtn">Přejít na Audio Procesor</span>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                </svg>
+            </div>
+        </a>
+
+        <!-- File Info -->
+        <div class="file-info hidden" id="fileInfo">
+            <div class="file-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="m9 9 10.5-3m0 6.553v3.75a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a1.803 1.803 0 1 1-.99-3.467l2.31-.66a2.25 2.25 0 0 0 1.632-2.163Zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a1.803 1.803 0 0 1-.99-3.467l2.31-.66A2.25 2.25 0 0 0 9 15.553Z" />
+                </svg>
+            </div>
+            <div class="file-details">
+                <h3 id="fileName">-</h3>
+                <p id="fileMetadata">-</p>
+            </div>
+            <button class="remove-btn" id="removeFile" title="Odebrat soubor" data-i18n-title="tsRemoveFile">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"
+                    stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Original Audio Card -->
+        <div class="card hidden" id="originalCard">
+            <div class="card-header">
+                <h2><span data-i18n="tsOriginalAudio">📊 Původní Audio</span></h2>
+
+            </div>
+
+            <div class="waveform-container">
+                <canvas class="waveform-canvas" id="originalWaveform"></canvas>
+            </div>
+
+            <div class="playback-controls">
+                <button class="play-btn" id="playOriginal" title="Přehrát/zastavit originál"
+                    data-i18n-title="tsPlayOriginal">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                        id="playIconOriginal">
+                        <path fill-rule="evenodd"
+                            d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </button>
+                <span class="time-display" id="timeOriginal">0:00 / 0:00</span>
+                <div class="progress-bar" id="progressOriginal">
+                    <div class="progress-bar-fill" id="progressFillOriginal"></div>
+                </div>
+            </div>
+
+            <div class="analysis-box">
+                <div class="analysis-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    </svg>
+                    <span>Informace</span>
+                </div>
+                <div class="analysis-item">
+                    <span class="label" data-i18n="tsOriginalDuration">Původní délka</span>
+                    <span class="value" id="originalDuration">-</span>
+                </div>
+                <div class="analysis-item">
+                    <span class="label" data-i18n="tsSampleRate">Sample Rate</span>
+                    <span class="value" id="sampleRate">-</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Time-Stretch Settings -->
+        <div class="card hidden" id="settingsCard">
+            <div class="card-header">
+                <h2 data-i18n="tsSettingsTitle">⚡ Nastavení Time-Stretch</h2>
+            </div>
+
+            <div class="settings-content">
+                <div class="setting-group">
+                    <h4 data-i18n="tsTargetDuration">Cílová délka</h4>
+                    <div class="time-inputs">
+                        <div class="time-input-group">
+                            <input type="number" id="targetMin" value="0" min="0" max="999">
+                            <span class="time-label">min</span>
+                        </div>
+                        <span class="time-separator">:</span>
+                        <div class="time-input-group">
+                            <input type="number" id="targetSec" value="0" min="0" max="59">
+                            <span class="time-label">sec</span>
+                        </div>
+                    </div>
+                    <p class="setting-desc" id="speedInfo"><span data-i18n="tsSpeedChange">Změna rychlosti</span>: 0%
+                    </p>
+                </div>
+
+                <div class="setting-group">
+                    <h4 data-i18n="tsOrSpeed">Nebo zadej rychlost</h4>
+                    <div class="speed-slider-container">
+                        <input type="range" id="speedSlider" min="50" max="200" value="100" step="1">
+                        <span class="speed-value" id="speedValue">100%</span>
+                    </div>
+                    <p class="setting-desc" data-i18n="tsSpeedHint">50% = dvojnásobná délka, 200% = poloviční délka</p>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="btn btn-primary" id="processBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+                    </svg>
+                    <span data-i18n="tsProcessBtn">Zpracovat Audio</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Result Card -->
+        <div class="card hidden" id="resultCard">
+            <div class="card-header">
+                <h2 data-i18n="tsResultTitle">✅ Výsledek</h2>
+                <span class="badge processed" data-i18n="processedBadge">UPRAVENO</span>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab active" data-tab="result" data-i18n="tsTabResult">Výsledek</button>
+                <button class="tab" data-tab="compare" data-i18n="tsTabCompare">Porovnání A/B</button>
+            </div>
+
+            <!-- Result Tab -->
+            <div class="tab-content" id="resultTab">
+                <div class="waveform-container" style="cursor: pointer;" title="Klikni pro přehrávání"
+                    data-i18n-title="tsClickToPlay">
+                    <canvas class="waveform-canvas" id="resultWaveform"></canvas>
+                </div>
+
+                <div class="playback-controls">
+                    <button class="play-btn" id="playResult" title="Přehrát/zastavit upravené"
+                        data-i18n-title="tsPlayResult">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                            id="playIconResult">
+                            <path fill-rule="evenodd"
+                                d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <span class="time-display" id="timeResult">0:00 / 0:00</span>
+                    <div class="progress-bar" id="progressResult">
+                        <div class="progress-bar-fill" id="progressFillResult"></div>
+                    </div>
+                </div>
+
+                <div class="analysis-box">
+                    <div class="analysis-item">
+                        <span class="label" data-i18n="tsNewDuration">Nová délka</span>
+                        <span class="value" id="resultDuration">-</span>
+                    </div>
+                    <div class="analysis-item">
+                        <span class="label" data-i18n="tsSpeedChange">Změna rychlosti</span>
+                        <span class="value" id="resultSpeed">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Compare Tab -->
+            <div class="tab-content hidden" id="compareTab">
+                <!-- Original -->
+                <div class="compare-container">
+                    <div
+                        style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <h4 style="margin: 0;"><span data-i18n="tsOriginalAudio"></span></h4>
+                        <button class="play-btn small" id="playCompareOriginal" title="Přehrát/zastavit originál"
+                            data-i18n-title="tsPlayOriginal">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                id="playIconCompareOriginal">
+                                <path fill-rule="evenodd"
+                                    d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="waveform-container compare-waveform" title="Klikni pro přehrávání"
+                        data-i18n-title="tsClickToPlay">
+                        <canvas class="waveform-canvas" id="compareOriginalWaveform"
+                            style="width: 100%; height: 100%;"></canvas>
+                    </div>
+                </div>
+
+                <!-- A/B Toggle -->
+                <div class="ab-toggle-container">
+                    <button class="ab-toggle" id="abToggle" title="Přepnout mezi originál a upravenou verzí"
+                        data-i18n-title="tsSwitchView">
+                        <span class="ab-label ab-a active">A</span>
+                        <span class="ab-divider">|</span>
+                        <span class="ab-label ab-b">B</span>
+                    </button>
+                    <span class="ab-hint" data-i18n="abHint">Klikni pro přepnutí Originál ↔ Upraveno</span>
+                </div>
+
+                <!-- Processed -->
+                <div class="compare-container">
+                    <div
+                        style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <h4 style="margin: 0; color: var(--accent);"><span data-i18n="tsTabResult"></span></h4>
+                        <button class="play-btn small" id="playCompareResult" title="Přehrát/zastavit upravené"
+                            data-i18n-title="tsPlayResult">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                id="playIconCompareResult">
+                                <path fill-rule="evenodd"
+                                    d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="waveform-container compare-waveform" title="Klikni pro přehrávání"
+                        data-i18n-title="tsClickToPlay">
+                        <canvas class="waveform-canvas" id="compareResultWaveform"
+                            style="width: 100%; height: 100%;"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="btn btn-secondary" id="backBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
+                    </svg>
+                    <span data-i18n="tsEditSettings">Upravit nastavení</span>
+                </button>
+                <button class="btn btn-primary" id="downloadBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                    </svg>
+                    <span data-i18n="tsDownloadMp3">Stáhnout MP3</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Processing Overlay -->
+    <div class="processing-overlay" id="processingOverlay">
+        <div class="processing-content">
+            <div class="spinner"></div>
+            <div class="processing-text" id="processingText" data-i18n="tsProcessing">Zpracovávám...</div>
+            <div class="processing-sub" id="processingSub" data-i18n="tsApplyingTimeStretch">Aplikuji time-stretch
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-percent" id="progressPercent">0%</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Warning Modal -->
+    <div class="modal-overlay" id="warningModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                            d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
+                        </path>
+                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                    <span data-i18n="warningTitle" id="modalTitleText">Důležité upozornění</span>
+                </h3>
+            </div>
+            <div class="modal-body">
+                <p data-i18n="tsWarningBody" id="modalBodyText">
+                    Time-Stretch mění rychlost audia bez změny tóniny. Výsledek vždy zkontrolujte poslechem.
+                    Extrémní změny rychlosti (pod 70% nebo nad 130%) mohou způsobit artefakty.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="modalCancel" data-i18n="warningCancel">Zrušit</button>
+                <button class="btn btn-primary" id="modalConfirm" data-i18n="warningConfirm">Rozumím,
+                    pokračovat</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="language-dropdown" id="languageDropdown">
+            <button class="lang-btn" id="langBtn" aria-expanded="false" title="Změnit jazyk">
+                <img src="https://flagcdn.com/24x18/cz.png" alt="CS" class="flag-icon" id="currentFlag">
+                <span id="currentLangLabel">Čeština</span>
+                <svg class="chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m6 9 6 6 6-6" />
+                </svg>
+            </button>
+            <div class="lang-menu hidden" id="langMenu">
+                <div class="lang-item" data-value="cs">
+                    <img src="https://flagcdn.com/24x18/cz.png" alt="CS" class="flag-icon">
+                    <span>Čeština</span>
+                </div>
+                <div class="lang-item" data-value="en">
+                    <img src="https://flagcdn.com/24x18/gb.png" alt="EN" class="flag-icon">
+                    <span>English</span>
+                </div>
+                <div class="lang-item" data-value="de">
+                    <img src="https://flagcdn.com/24x18/de.png" alt="DE" class="flag-icon">
+                    <span>Deutsch</span>
+                </div>
+                <div class="lang-item" data-value="pl">
+                    <img src="https://flagcdn.com/24x18/pl.png" alt="PL" class="flag-icon">
+                    <span>Polski</span>
+                </div>
+            </div>
+        </div>
+        <p><span data-i18n="footerText">Zpracování probíhá v prohlížeči, soubory se nikam neodesílají</span></p>
+    </footer>
+
+    <!-- CDN Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js"></script>
+
+    <!-- Main Application (ES Module for dynamic import) -->
+    <script type="module" src="js/hall-main.js?v=14"></script>
+</body>
+
+</html>

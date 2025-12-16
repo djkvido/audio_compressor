@@ -171,6 +171,7 @@ h1 {
     margin-bottom: 1rem;
     padding-bottom: 0.75rem;
     border-bottom: 1px solid var(--border-subtle);
+    gap: 1rem;
 }
 
 .card-header h2 {
@@ -1077,17 +1078,7 @@ h1 {
     display: none !important;
 }
 
-footer {
-    text-align: center;
-    padding: 1.5rem;
-    color: var(--text-tertiary);
-    font-size: 0.75rem;
-}
 
-footer a {
-    color: var(--accent);
-    text-decoration: none;
-}
 
 /* ============ A/B Toggle Button ============ */
 .ab-toggle-container {
@@ -1341,4 +1332,385 @@ footer {
 /* Adjust hidden class */
 .settings-content.hidden {
     display: none;
+}
+
+/* ============ Time-Stretch Inputs ============ */
+.time-inputs {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.time-input-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.time-input-group input {
+    width: 80px;
+    padding: 0.75rem;
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.4);
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    transition: border-color 0.2s;
+}
+
+.time-input-group input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 15px var(--accent-glow);
+}
+
+.time-label {
+    font-size: 0.7rem;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    margin-top: 0.25rem;
+}
+
+.time-separator {
+    font-size: 2rem;
+    font-weight: 300;
+    color: var(--text-tertiary);
+    padding-bottom: 1rem;
+}
+
+/* Speed Slider */
+.speed-slider-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.speed-slider-container input[type="range"] {
+    flex: 1;
+    height: 6px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.speed-slider-container input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    background: var(--accent);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 10px var(--accent-glow);
+    transition: transform 0.15s;
+}
+
+.speed-slider-container input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+}
+
+.speed-value {
+    min-width: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+}
+
+/* === Tabs === */
+.tabs {
+    display: flex;
+    gap: 0.25rem;
+    margin-bottom: 1rem;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 4px;
+    border-radius: 10px;
+}
+
+.tab {
+    flex: 1;
+    padding: 0.6rem 1rem;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-weight: 500;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tab:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.tab.active {
+    background: var(--accent);
+    color: #000;
+}
+
+.tab-content {
+    animation: fadeIn 0.2s ease;
+}
+
+.tab-content.hidden {
+    display: none;
+}
+
+/* === A/B Toggle === */
+.ab-toggle-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 0;
+}
+
+.ab-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1.25rem;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-light);
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.ab-toggle:hover {
+    background: rgba(0, 0, 0, 0.6);
+    border-color: var(--accent);
+    box-shadow: 0 0 20px var(--accent-glow);
+}
+
+.ab-label {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text-dim);
+    transition: all 0.2s ease;
+    min-width: 24px;
+    text-align: center;
+}
+
+.ab-label.active {
+    color: var(--accent);
+    text-shadow: 0 0 10px var(--accent);
+}
+
+.ab-divider {
+    color: var(--text-dim);
+    opacity: 0.5;
+}
+
+.ab-hint {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+}
+
+/* === Compare Container === */
+.compare-container {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.compare-container h4 {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.compare-container .waveform-container {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Nav button small variant */
+.nav-btn.small {
+    width: 28px;
+    height: 28px;
+    padding: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+}
+
+.nav-btn.small:hover {
+    background: var(--accent);
+    color: #000;
+}
+
+.nav-btn.small svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Compare waveform specific */
+.compare-waveform {
+    height: 80px;
+    cursor: pointer;
+    width: 100%;
+}
+
+.compare-waveform canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    cursor: pointer;
+}
+
+/* Compact play button for compare view */
+.play-btn.small {
+    width: 32px;
+    height: 32px;
+    padding: 6px;
+    min-width: 32px;
+}
+
+/* ============ Feature Promo Card ============ */
+.feature-promo-card {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.25rem;
+    background: linear-gradient(135deg, rgba(30, 30, 50, 0.6), rgba(45, 45, 70, 0.4));
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.feature-promo-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 20px rgba(0, 212, 255, 0.15);
+    background: linear-gradient(135deg, rgba(30, 30, 50, 0.8), rgba(45, 45, 70, 0.6));
+}
+
+.feature-promo-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--accent);
+    opacity: 0.5;
+    transition: opacity 0.3s;
+}
+
+.feature-promo-card:hover::before {
+    opacity: 1;
+}
+
+.promo-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 212, 255, 0.1);
+    border-radius: 12px;
+    color: var(--accent);
+    flex-shrink: 0;
+}
+
+.promo-icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+.promo-content {
+    flex: 1;
+}
+
+.promo-content h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.promo-content p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.promo-action {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--accent);
+    font-weight: 500;
+    font-size: 0.9rem;
+    padding-left: 1rem;
+    border-left: 1px solid var(--border-subtle);
+}
+
+.promo-action svg {
+    width: 18px;
+    height: 18px;
+    transition: transform 0.3s;
+}
+
+.feature-promo-card:hover .promo-action svg {
+    transform: translateX(4px);
+}
+
+/* Mobile responsive */
+@media (max-width: 600px) {
+    .feature-promo-card {
+        flex-direction: column;
+        text-align: center;
+        padding: 1.5rem;
+        gap: 1rem;
+    }
+
+    .promo-action {
+        border-left: none;
+        padding-left: 0;
+        margin-top: 0.5rem;
+        width: 100%;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 0.75rem;
+        border-radius: 8px;
+    }
+}
+
+/* ============ App Header ============ */
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0 2rem;
+    margin-bottom: 0;
+}
+
+.app-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0;
+    background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.02em;
+    text-shadow: 0 4px 12px rgba(165, 180, 252, 0.15);
 }

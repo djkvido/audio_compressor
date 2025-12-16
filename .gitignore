@@ -14,3 +14,8 @@ bck/
 *.rar
 *.zip
 *.7z
+
+# User's specifics
+aaaavenv/
+processed_audio/
+*.log

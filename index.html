@@ -45,6 +45,9 @@
 
 
     <div class="container">
+        <header class="app-header">
+            <h1 class="app-title" data-i18n="appTitleMain">Audio Kompresor</h1>
+        </header>
         <!-- Upload Section -->
         <div class="upload-zone" id="uploadZone">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -61,6 +64,27 @@
         <p class="upload-hint-bottom" id="uploadHint" data-i18n="uploadHint"
             style="text-align: center; margin: 20px auto 30px; font-size: 0.75rem; color: #888; max-width: 550px; line-height: 1.5;">
         </p>
+
+        <!-- Feature Promo Card -->
+        <a href="hall_edit.html" class="feature-promo-card">
+            <div class="promo-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                </svg>
+            </div>
+            <div class="promo-content">
+                <h3 data-i18n="promoTitle">Zrychlení záznamu pro halové vystoupení</h3>
+            </div>
+            <div class="promo-action">
+                <span data-i18n="promoBtn">Otevřít Studio</span>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                </svg>
+            </div>
+        </a>
 
         <!-- File Info (shown after upload) -->
         <div class="file-info hidden" id="fileInfo">
@@ -103,7 +127,6 @@
         <div class="card hidden" id="analysisCard">
             <div class="card-header">
                 <h2 data-i18n="analysisTitle">📊 Analýza původního souboru</h2>
-                <span class="badge original" data-i18n="originalBadge">ORIGINÁL</span>
             </div>
 
             <div class="waveform-container">

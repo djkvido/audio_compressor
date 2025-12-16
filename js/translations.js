@@ -10,9 +10,21 @@ const translations = {
         uploadFormats: "Podporované formáty: MP3, WAV, FLAC, OGG, M4A",
         uploadHint: "Je možné nahrát více souborů najednou pomocí přetažení nebo výběrem přes Ctrl (Cmd na Macu). Doporučujeme ale upravovat písničky jednotlivě z důvodu kontroly.",
 
+        // Promo Hall Edit
+        promoTitle: "Zrychlení záznamu pro halové vystoupení",
+        promoBtn: "Otevřít",
+
+        // Promo Back (Main)
+        promoBackTitle: "Profesionální analýza a normalizace audia",
+        promoBackBtn: "Otevřít",
+
+        // App Titles
+        appTitleMain: "Audio Kompresor",
+        appTitleHall: "Time-Stretch",
+
         // Analysis
         analysisTitle: "Analýza",
-        originalBadge: "ORIGINÁL",
+
         peakLabel: "Peak:",
         rmsLabel: "RMS:",
         peak: "Peak",
@@ -113,6 +125,41 @@ const translations = {
         warningBody: "Tento nástroj slouží jako pomocník pro optimalizaci audia. Automatické úpravy nemusí být vždy perfektní. Vždy proveďte finální kontrolu poslechem, abyste se ujistili, že výsledek odpovídá vašim představám a je optimalizován správně.",
         warningConfirm: "Rozumím, pokračovat",
         warningCancel: "Zrušit",
+        tsWarningBody: "Time-Stretch mění rychlost audia bez změny tóniny. Výsledek vždy zkontrolujte poslechem. Extrémní změny rychlosti (pod 70% nebo nad 130%) mohou způsobit artefakty.",
+
+        // Time-Stretch specific
+        tsOriginalAudio: "📊 Původní Audio ",
+        tsInfo: "Informace",
+        tsOriginalDuration: "Původní délka",
+        tsSampleRate: "Sample Rate",
+        tsSettingsTitle: "⚡ Nastavení Time-Stretch",
+        tsTargetDuration: "Cílová délka",
+        tsOrSpeed: "Nebo zadej rychlost",
+        tsSpeedHint: "50% = dvojnásobná délka, 200% = poloviční délka",
+        tsProcessBtn: "Zpracovat Audio",
+        tsResultTitle: "✅ Výsledek",
+        tsTabResult: "Výsledek",
+        tsTabCompare: "Porovnání A/B",
+        tsNewDuration: "Nová délka",
+        tsSpeedChange: "Změna rychlosti",
+        tsEditSettings: "Upravit nastavení",
+        tsDownloadMp3: "Stáhnout MP3",
+        tsProcessing: "Zpracovávám...",
+        tsApplyingTimeStretch: "Aplikuji time-stretch",
+        tsRemoveFile: "Odebrat soubor",
+        tsPlayOriginal: "Přehrát/zastavit originál",
+        tsPlayResult: "Přehrát/zastavit upravené",
+        tsSwitchView: "Přepnout mezi originál a upravenou verzí",
+        tsClickToPlay: "Klikni pro přehrávání",
+
+        // JS Alerts
+        errLoadAudio: "Chyba při načítání audia: ",
+        errInvalidTime: "Zadejte platný čas",
+        errDurationZero: "Cílová délka musí být větší než 0",
+        errSpeedRange: "Změna rychlosti musí být mezi 50% a 200%",
+        errBrowserDownload: "Prohlížeč nepodporuje stahování souborů.",
+
+        tsEncodingMp3: "Enkóduji MP3...",
 
         // Advanced Warning Modal
         advancedWarningTitle: "Pokročilé nastavení",
@@ -132,9 +179,20 @@ const translations = {
         uploadFormats: "Supported formats: MP3, WAV, FLAC, OGG, M4A",
         uploadHint: "You can upload multiple files by dragging or selecting via Ctrl (Cmd on Mac). However, we recommend processing songs individually for better quality control.",
 
+        promoTitle: "Speed up recordings for hall performances",
+        promoBtn: "Open",
+
+        // Promo Back (Main)
+        promoBackTitle: "Professional Audio Analysis & Normalization",
+        promoBackBtn: "Open",
+
+        // App Titles
+        appTitleMain: "Audio Compressor",
+        appTitleHall: "Time-Stretch",
+
         // Analysis
         analysisTitle: "Analysis",
-        originalBadge: "ORIGINAL",
+
         peakLabel: "Peak:",
         rmsLabel: "RMS:",
         peak: "Peak",
@@ -233,6 +291,41 @@ const translations = {
         warningBody: "This tool is designed to assist with audio optimization. Automatic adjustments may not always be perfect. Always perform a final listening check to ensure the result meets your expectations and is optimized correctly.",
         warningConfirm: "I understand, proceed",
         warningCancel: "Cancel",
+        tsWarningBody: "Time-Stretch changes audio speed without altering pitch. Always check the result by listening. Extreme speed changes (below 70% or above 130%) may cause artifacts.",
+
+        // Time-Stretch specific
+        tsOriginalAudio: "📊 Original Audio",
+        tsInfo: "Information",
+        tsOriginalDuration: "Original duration",
+        tsSampleRate: "Sample Rate",
+        tsSettingsTitle: "⚡ Time-Stretch Settings",
+        tsTargetDuration: "Target duration",
+        tsOrSpeed: "Or set speed",
+        tsSpeedHint: "50% = double length, 200% = half length",
+        tsProcessBtn: "Process Audio",
+        tsResultTitle: "✅ Result",
+        tsTabResult: "Result",
+        tsTabCompare: "A/B Comparison",
+        tsNewDuration: "New duration",
+        tsSpeedChange: "Speed change",
+        tsEditSettings: "Edit settings",
+        tsDownloadMp3: "Download MP3",
+        tsProcessing: "Processing...",
+        tsApplyingTimeStretch: "Applying time-stretch",
+        tsRemoveFile: "Remove file",
+        tsPlayOriginal: "Play/Pause original",
+        tsPlayResult: "Play/Pause result",
+        tsSwitchView: "Switch between original and processed",
+        tsClickToPlay: "Click to play",
+
+        // JS Alerts
+        errLoadAudio: "Error loading audio: ",
+        errInvalidTime: "Please enter valid time",
+        errDurationZero: "Target duration must be greater than 0",
+        errSpeedRange: "Speed change must be between 50% and 200%",
+        errBrowserDownload: "Browser does not support file downloading.",
+
+        tsEncodingMp3: "Encoding MP3...",
 
         // Advanced Warning Modal
         advancedWarningTitle: "Advanced Settings",
@@ -251,9 +344,20 @@ const translations = {
         uploadBrowse: "Datei auswählen",
         uploadFormats: "Unterstützte Formate: MP3, WAV, FLAC, OGG, M4A",
 
+        promoTitle: "Aufnahmen für Hallenauftritte beschleunigen",
+        promoBtn: "Öffnen",
+
+        // Promo Back (Main)
+        promoBackTitle: "Professionelle Audio-Analyse & Normalisierung",
+        promoBackBtn: "Öffnen",
+
+        // App Titles
+        appTitleMain: "Audio Kompressor",
+        appTitleHall: "Time-Stretch",
+
         // Analysis
         analysisTitle: "Analyse",
-        originalBadge: "ORIGINAL",
+
         peakLabel: "Peak:",
         rmsLabel: "RMS:",
         peak: "Peak",
@@ -353,6 +457,41 @@ const translations = {
         warningBody: "Dieses Tool dient als Hilfsmittel zur Audio-Optimierung. Automatische Anpassungen sind möglicherweise nicht immer perfekt. Führen Sie immer eine abschließende Hörprobe durch, um sicherzustellen, dass das Ergebnis Ihren Erwartungen entspricht und korrekt optimiert ist.",
         warningConfirm: "Ich verstehe, fortfahren",
         warningCancel: "Stornieren",
+        tsWarningBody: "Time-Stretch ändert die Audiogeschwindigkeit ohne Tonhöhenänderung. Überprüfen Sie das Ergebnis immer durch Anhören. Extreme Geschwindigkeitsänderungen (unter 70% oder über 130%) können Artefakte verursachen.",
+
+        // Time-Stretch specific
+        tsOriginalAudio: "📊 Original Audio",
+        tsInfo: "Information",
+        tsOriginalDuration: "Originallänge",
+        tsSampleRate: "Abtastrate",
+        tsSettingsTitle: "⚡ Time-Stretch Einstellungen",
+        tsTargetDuration: "Zieldauer",
+        tsOrSpeed: "Oder Geschwindigkeit einstellen",
+        tsSpeedHint: "50% = doppelte Länge, 200% = halbe Länge",
+        tsProcessBtn: "Audio verarbeiten",
+        tsResultTitle: "✅ Ergebnis",
+        tsTabResult: "Ergebnis",
+        tsTabCompare: "A/B Vergleich",
+        tsNewDuration: "Neue Dauer",
+        tsSpeedChange: "Geschwindigkeitsänderung",
+        tsEditSettings: "Einstellungen bearbeiten",
+        tsDownloadMp3: "MP3 herunterladen",
+        tsProcessing: "Verarbeitung...",
+        tsApplyingTimeStretch: "Time-Stretch anwenden",
+        tsRemoveFile: "Datei entfernen",
+        tsPlayOriginal: "Original abspielen/pausieren",
+        tsPlayResult: "Ergebnis abspielen/pausieren",
+        tsSwitchView: "Zwischen Original und Ergebnis umschalten",
+        tsClickToPlay: "Zum Abspielen klicken",
+
+        // JS Alerts
+        errLoadAudio: "Fehler beim Laden von Audio: ",
+        errInvalidTime: "Bitte geben Sie eine gültige Zeit ein",
+        errDurationZero: "Zieldauer muss größer als 0 sein",
+        errSpeedRange: "Geschwindigkeitsänderung muss zwischen 50% und 200% liegen",
+        errBrowserDownload: "Der Browser unterstützt das Herunterladen von Dateien nicht.",
+
+        tsEncodingMp3: "MP3 wird kodiert...",
 
         // Advanced Warning Modal
         advancedWarningTitle: "Erweiterte Einstellungen",
@@ -371,9 +510,20 @@ const translations = {
         uploadBrowse: "wybierz plik",
         uploadFormats: "Obsługiwane formaty: MP3, WAV, FLAC, OGG, M4A",
 
+        promoTitle: "Przyspieszanie nagrań na występy halowe",
+        promoBtn: "Otwórz",
+
+        // Promo Back (Main)
+        promoBackTitle: "Profesjonalna analiza i normalizacja dźwięku",
+        promoBackBtn: "Otwórz",
+
+        // App Titles
+        appTitleMain: "Kompresor Audio",
+        appTitleHall: "Time-Stretch",
+
         // Analysis
         analysisTitle: "Analiza",
-        originalBadge: "ORYGINAŁ",
+
         peakLabel: "Peak:",
         rmsLabel: "RMS:",
         peak: "Peak",
@@ -473,6 +623,41 @@ const translations = {
         warningBody: "To narzędzie służy jako pomoc w optymalizacji dźwięku. Automatyczne dostosowania nie zawsze mogą być idealne. Zawsze wykonaj końcowy odsłuch, aby upewnić się, że wynik spełnia Twoje oczekiwania i jest poprawnie zoptymalizowany.",
         warningConfirm: "Rozumiem, kontynuuj",
         warningCancel: "Anuluj",
+        tsWarningBody: "Time-Stretch zmienia prędkość dźwięku bez zmiany wysokości tonu. Zawsze sprawdź wynik przez odsłuch. Ekstremalne zmiany prędkości (poniżej 70% lub powyżej 130%) mogą powodować artefakty.",
+
+        // Time-Stretch specific
+        tsOriginalAudio: "📊 Oryginalny dźwięk",
+        tsInfo: "Informacje",
+        tsOriginalDuration: "Oryginalny czas trwania",
+        tsSampleRate: "Częstotliwość próbkowania",
+        tsSettingsTitle: "⚡ Ustawienia Time-Stretch",
+        tsTargetDuration: "Docelowy czas trwania",
+        tsOrSpeed: "Lub ustaw prędkość",
+        tsSpeedHint: "50% = podwójna długość, 200% = połowa długości",
+        tsProcessBtn: "Przetwórz dźwięk",
+        tsResultTitle: "✅ Wynik",
+        tsTabResult: "Wynik",
+        tsTabCompare: "Porównanie A/B",
+        tsNewDuration: "Nowy czas trwania",
+        tsSpeedChange: "Zmiana prędkości",
+        tsEditSettings: "Edytuj ustawienia",
+        tsDownloadMp3: "Pobierz MP3",
+        tsProcessing: "Przetwarzanie...",
+        tsApplyingTimeStretch: "Stosowanie time-stretch",
+        tsRemoveFile: "Usuń plik",
+        tsPlayOriginal: "Odtwórz/wstrzymaj oryginał",
+        tsPlayResult: "Odtwórz/wstrzymaj wynik",
+        tsSwitchView: "Przełącz między oryginałem a wynikiem",
+        tsClickToPlay: "Kliknij, aby odtworzyć",
+
+        // JS Alerts
+        errLoadAudio: "Błąd ładowania dźwięku: ",
+        errInvalidTime: "Wprowadź prawidłowy czas",
+        errDurationZero: "Docelowy czas trwania musi być większy niż 0",
+        errSpeedRange: "Zmiana prędkości musi wynosić od 50% do 200%",
+        errBrowserDownload: "Przeglądarka nie obsługuje pobierania plików.",
+
+        tsEncodingMp3: "Kodowanie MP3...",
 
         // Advanced Warning Modal
         advancedWarningTitle: "Ustawienia zaawansowane",
@@ -514,6 +699,12 @@ function setLanguage(lang) {
         } else {
             el.textContent = translation;
         }
+    });
+
+    // Update all elements with data-i18n-title attribute
+    document.querySelectorAll('[data-i18n-title]').forEach(el => {
+        const key = el.getAttribute('data-i18n-title');
+        el.title = t(key);
     });
 
     // Update language selector

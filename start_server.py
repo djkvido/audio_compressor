@@ -4,8 +4,8 @@ import webbrowser
 import os
 import sys
 
-# Port, kde to celé pojede (localhost:8000)
-PORT = 8000
+# Port, kde to celé pojede (localhost:8081) - Změněno pro obejití cache
+PORT = 8081
 
 class Handler(http.server.SimpleHTTPRequestHandler):
     def end_headers(self):
@@ -24,6 +24,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self.send_header('Content-Type', 'application/json')
         elif path.endswith('.svg'):
             self.send_header('Content-Type', 'image/svg+xml')
+        elif path.endswith('.wasm'):
+            self.send_header('Content-Type', 'application/wasm')
             
         super().end_headers()
 
