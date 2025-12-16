@@ -128,35 +128,36 @@ function setupEventListeners() {
         }
     });
 
-    fileInput.addEventListener('change', e => {
+    fileInput?.addEventListener('change', e => {
         if (e.target.files.length) {
             handleFiles(e.target.files);
         }
     });
 
     // Odstranit soubor
-    $('removeFile').addEventListener('click', resetApp);
-    $('clearBatch').addEventListener('click', resetApp);
+    $('removeFile')?.addEventListener('click', resetApp);
+    $('clearBatch')?.addEventListener('click', resetApp);
 
     // Spuštění zpracování jednoho souboru (Single mode)
-    $('processBtn').addEventListener('click', () => {
+    $('processBtn')?.addEventListener('click', () => {
         showWarningModal(() => {
             processAudio(state, (settings) => {
                 const duration = showResults(state, settings);
-                $('timeProcessed').textContent = `0:00 / ${formatTime(duration)}`;
+                const timeEl = $('timeProcessed');
+                if (timeEl) timeEl.textContent = `0:00 / ${formatTime(duration)}`;
             });
         });
     });
 
     // Tlačítko Zpracovat (Batch)
-    $('processBatchBtn').addEventListener('click', () => {
+    $('processBatchBtn')?.addEventListener('click', () => {
         showWarningModal(() => {
             processBatchQueue();
         });
     });
 
     // Tlačítko Stáhnout Batch (ZIP)
-    $('downloadBatchBtn').addEventListener('click', () => {
+    $('downloadBatchBtn')?.addEventListener('click', () => {
         if (!state.batchZipBlob) return;
 
         const url = URL.createObjectURL(state.batchZipBlob);
@@ -169,17 +170,17 @@ function setupEventListeners() {
     });
 
     // Přehrávač - Ovládání pro Originál
-    $('playOriginal').addEventListener('click', () => togglePlayback('original'));
-    $('progressOriginal').addEventListener('click', e => seekAudio(e, 'original'));
+    $('playOriginal')?.addEventListener('click', () => togglePlayback('original'));
+    $('progressOriginal')?.addEventListener('click', e => seekAudio(e, 'original'));
 
     // Přehrávač - Ovládání pro Výsledek (Upravené)
-    $('playProcessed').addEventListener('click', () => togglePlayback('processed'));
-    $('progressProcessed').addEventListener('click', e => seekAudio(e, 'processed'));
+    $('playProcessed')?.addEventListener('click', () => togglePlayback('processed'));
+    $('progressProcessed')?.addEventListener('click', e => seekAudio(e, 'processed'));
 
     // Kliknutí přímo do grafu vlny (Canvasu) pro rychlý posun
     document.addEventListener('click', e => {
         const canvas = e.target;
-        if (canvas.classList.contains('waveform-canvas')) {
+        if (canvas?.classList?.contains('waveform-canvas')) {
             const canvasId = canvas.id;
 
             if (canvasId === 'originalWaveform' || canvasId === 'compareOriginalWaveform') {
@@ -203,10 +204,10 @@ function setupEventListeners() {
     }
 
     // Formát exportu
-    $('exportFormat').addEventListener('change', (e) => {
+    $('exportFormat')?.addEventListener('change', (e) => {
         state.exportFormat = e.target.value;
         const btnTextKey = state.exportFormat === 'wav' ? 'downloadBtnWav' : 'downloadBtnMp3';
-        const btnSpan = $('downloadBtn').querySelector('span');
+        const btnSpan = $('downloadBtn')?.querySelector('span');
         if (btnSpan) {
             btnSpan.setAttribute('data-i18n', btnTextKey);
             btnSpan.textContent = t(btnTextKey);
@@ -214,7 +215,7 @@ function setupEventListeners() {
     });
 
     // Tlačítka Zpět a Stáhnout
-    $('backBtn').addEventListener('click', () => {
+    $('backBtn')?.addEventListener('click', () => {
         if (audioElements.processed) {
             audioElements.processed.pause();
             audioElements.processed = null;
@@ -222,14 +223,14 @@ function setupEventListeners() {
         clearInterval(playbackIntervals.processed);
         state.processedBlob = null; // Vyčistit pro nové zpracování
 
-        resultCard.classList.add('hidden');
-        settingsCard.classList.remove('hidden');
-        analysisCard.classList.remove('hidden');
+        resultCard?.classList.add('hidden');
+        settingsCard?.classList.remove('hidden');
+        analysisCard?.classList.remove('hidden');
 
         const singleActions = document.getElementById('singleProcessActions');
         if (singleActions) singleActions.classList.remove('hidden');
     });
-    $('downloadBtn').addEventListener('click', downloadProcessed);
+    $('downloadBtn')?.addEventListener('click', downloadProcessed);
 
     // A/B Toggle
     const abToggle = $('abToggle');
