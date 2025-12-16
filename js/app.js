@@ -41,9 +41,31 @@ const batchListCard = $('batchListCard');
 const batchProcessActions = $('batchProcessActions');
 
 // ============ Startujeme ============
+// ============ Startujeme ============
 function init() {
-    initLanguage();
-    setupEventListeners();
+    try {
+        console.log("App initializing...");
+        initLanguage();
+    } catch (e) {
+        console.error("Language init failed:", e);
+    }
+
+    try {
+        setupEventListeners();
+        console.log("Event listeners setup complete.");
+    } catch (e) {
+        alert("Critical Error: UI Setup Failed. " + e.message);
+        console.error("UI Setup failed:", e);
+    }
+
+    // Initialize Audio Context lazily or safely
+    try {
+        if (!window.AudioContext && !window.webkitAudioContext) {
+            console.warn("Web Audio API not supported");
+        }
+    } catch (e) {
+        console.error("Audio support check failed:", e);
+    }
 }
 
 function setupEventListeners() {
@@ -209,22 +231,38 @@ function setupEventListeners() {
         abToggle.addEventListener('click', handleABToggle);
     }
 
-    // Toggle Advanced Settings
+    // Toggle Advanced Settings (Robusní verze pro Chrome)
     const toggleAdvancedBtn = $('toggleAdvancedSettings');
     const advancedContent = $('advancedSettingsContent');
+
     if (toggleAdvancedBtn && advancedContent) {
-        toggleAdvancedBtn.addEventListener('click', () => {
-            const isHidden = advancedContent.classList.contains('hidden');
-            if (isHidden) {
-                showWarningModal(() => {
-                    advancedContent.classList.remove('hidden');
-                    toggleAdvancedBtn.classList.add('active');
-                }, 'advancedWarningTitle', 'advancedWarningBody');
-            } else {
-                advancedContent.classList.add('hidden');
-                toggleAdvancedBtn.classList.remove('active');
+        toggleAdvancedBtn.addEventListener('click', (e) => {
+            e.preventDefault(); // Prevent accidental form submissions or weird behavior
+            try {
+                const isHidden = advancedContent.classList.contains('hidden');
+                if (isHidden) {
+                    // Check if modal exists
+                    if (typeof showWarningModal === 'function') {
+                        showWarningModal(() => {
+                            advancedContent.classList.remove('hidden');
+                            toggleAdvancedBtn.classList.add('active');
+                        }, 'advancedWarningTitle', 'advancedWarningBody');
+                    } else {
+                        // Fallback if modal missing
+                        advancedContent.classList.remove('hidden');
+                        toggleAdvancedBtn.classList.add('active');
+                    }
+                } else {
+                    advancedContent.classList.add('hidden');
+                    toggleAdvancedBtn.classList.remove('active');
+                }
+            } catch (err) {
+                console.error("Settings toggle failed:", err);
+                alert("Settings Error: " + err.message);
             }
         });
+    } else {
+        console.warn("Settings elements not found in DOM");
     }
 
     // Přepínač jazyků (rozbalovací menu)

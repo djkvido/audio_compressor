@@ -23,6 +23,29 @@
 
 <body>
 
+    <!-- Global Error Handler for Mobile/Chrome Debugging -->
+    <script>
+        window.onerror = function (msg, url, line, col, error) {
+            // Ignore benign resizing errors or extensions
+            if (msg.includes("ResizeObserver") || msg.includes("Script error")) return;
+
+            // Alert user so they know SOMETHING broke "silently"
+            alert("System Error: " + msg + "\nLine: " + line);
+            console.error("Global Error:", msg, url, line, error);
+
+            // Try to log it to a visible element if possible
+            const footer = document.querySelector('footer');
+            if (footer) {
+                const errDiv = document.createElement('div');
+                errDiv.style.color = 'red';
+                errDiv.style.fontSize = '10px';
+                errDiv.textContent = msg;
+                footer.appendChild(errDiv);
+            }
+        };
+    </script>
+
+
 
     <div class="container">
         <!-- Upload Section -->
