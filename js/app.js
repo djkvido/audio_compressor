@@ -29,25 +29,31 @@ let playbackIntervals = {
 };
 
 // ============ DOM Elementy ============
-const uploadZone = $('uploadZone');
-const uploadHint = $('uploadHint');
-const fileInput = $('fileInput');
-const fileInfo = $('fileInfo');
-const analysisCard = $('analysisCard');
-const settingsCard = $('settingsCard');
-const resultCard = $('resultCard');
-
-const batchListCard = $('batchListCard');
-const batchProcessActions = $('batchProcessActions');
+// Inicializujeme až v init(), aby to nespadlo na null (Chrome fix)
+let uploadZone, uploadHint, fileInput, fileInfo;
+let analysisCard, settingsCard, resultCard;
+let batchListCard, batchProcessActions;
 
 // ============ Startujeme ============
 // ============ Startujeme ============
 function init() {
     try {
         console.log("App initializing...");
+
+        // DOM Init
+        uploadZone = $('uploadZone');
+        uploadHint = $('uploadHint');
+        fileInput = $('fileInput');
+        fileInfo = $('fileInfo');
+        analysisCard = $('analysisCard');
+        settingsCard = $('settingsCard');
+        resultCard = $('resultCard');
+        batchListCard = $('batchListCard');
+        batchProcessActions = $('batchProcessActions');
+
         initLanguage();
     } catch (e) {
-        console.error("Language init failed:", e);
+        console.error("DOM/Language init failed:", e);
     }
 
     try {
