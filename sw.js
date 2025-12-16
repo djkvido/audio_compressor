@@ -1,9 +1,9 @@
-const CACHE_NAME = 'audio-studio-v9';
+const CACHE_NAME = 'audio-studio-v9.2';
 const ASSETS = [
     './',
     './index.html',
-    './css/styles.css',
-    './js/app.js',
+    './css/styles.css?v=9.2',
+    './js/app.js?v=9.2',
     './js/audio-processor.js',
     './js/audio-worker.js',
     './js/ui.js',

@@ -409,23 +409,41 @@ function switchToAudio(targetType, currentTime) {
     }
 
     const audio = audioElements[targetType];
-    audio.currentTime = currentTime;
-    audio.play().then(() => {
-        updatePlayIcon(targetType, true);
 
-        // Interval pro update UI
-        if (playbackIntervals[targetType]) clearInterval(playbackIntervals[targetType]);
-        playbackIntervals[targetType] = setInterval(() => {
-            const ratio = audio.currentTime / audio.duration;
-            updateProgress(targetType, ratio);
-            updateTimeDisplay(targetType, audio.currentTime, audio.duration);
-            updateAllWaveformPlayheads(targetType, ratio);
-        }, 50);
+    // Chrome Fix: Ensure metadata is loaded before seeking
+    const playSafe = () => {
+        audio.currentTime = currentTime;
+        audio.play().then(() => {
+            updatePlayIcon(targetType, true);
 
-        // Aktualizace vizuálu tlačítka
-        updateABVisuals(targetType);
+            // Interval pro update UI
+            if (playbackIntervals[targetType]) clearInterval(playbackIntervals[targetType]);
+            playbackIntervals[targetType] = setInterval(() => {
+                if (!audio.paused) {
+                    const ratio = audio.currentTime / audio.duration;
+                    updateProgress(targetType, ratio);
+                    updateTimeDisplay(targetType, audio.currentTime, audio.duration);
+                    updateAllWaveformPlayheads(targetType, ratio);
+                }
+            }, 50);
 
-    }).catch(err => console.error("Playback failed:", err));
+            // Aktualizace vizuálu tlačítka
+            updateABVisuals(targetType);
+
+        }).catch(err => {
+            console.error("Playback failed:", err);
+            // Auto-resume audio context if suspended (Chrome policy)
+            if (state.audioContext && state.audioContext.state === 'suspended') {
+                state.audioContext.resume().then(() => playSafe());
+            }
+        });
+    };
+
+    if (audio.readyState >= 1) { // 1 = HAVE_METADATA
+        playSafe();
+    } else {
+        audio.addEventListener('loadedmetadata', playSafe, { once: true });
+    }
 }
 
 function redrawWaveformsForTab(tabName) {
