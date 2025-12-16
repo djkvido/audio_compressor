@@ -1,4 +1,15 @@
 // ============ Audio Studio - Tady to celé začíná ============
+
+// !!! PWA CLEANUP: Force unregister old Service Workers !!!
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(function (registrations) {
+        for (let registration of registrations) {
+            console.log('Cleaning up old Service Worker:', registration);
+            registration.unregister();
+        }
+    });
+}
+
 import { $, formatTime, formatFileSize, showProcessing, hideProcessing, switchTab } from './ui.js';
 import { drawWaveform, displayProblems, updateWaveformPlayhead, clearWaveformPlayhead } from './waveform.js';
 import { processAudio, showResults } from './audio-processor.js';
