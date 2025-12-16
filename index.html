@@ -512,6 +512,10 @@
                 title="Vymazat cache a aktualizovat aplikaci">
                 ↻ Reset Cache & Reload (v9.2 Sync Fix)
             </button>
+            <div style="margin-top: 5px;">
+                <a href="?safe_mode=true" style="color: #666; font-size: 0.6rem; text-decoration: none;">(Nefunguje?
+                    Zkusit Bezpečný Režim)</a>
+            </div>
         </div>
     </footer>
 
@@ -561,14 +565,25 @@
 
     <!-- Main Application (ES6 Module) -->
     <!-- Main Application (ES6 Module) -->
-    <script type="module" src="js/app.js?v=9.2"></script>
+    <script type="module" src="js/app.js?v=9.2"
+        onerror="alert('CRITICAL: Failed to load app.js. Check console for MIME type or Network errors.')"></script>
 
     <!-- PWA Registration -->
     <script>
-        if ('serviceWorker' in navigator) {
+        // Safe Mode: Bypass SW if requested (e.g. for debugging Chrome issues)
+        const urlParams = new URLSearchParams(window.location.search);
+        const isSafeMode = urlParams.get('safe_mode') === 'true';
+
+        if ('serviceWorker' in navigator && !isSafeMode) {
             navigator.serviceWorker.register('./sw.js')
                 .then(() => console.log('Service Worker Registered'))
                 .catch(err => console.error('SW Error:', err));
+        } else if (isSafeMode) {
+            console.warn("Safe Mode: Service Worker skipped.");
+            // Try to unregister existing ones just in case
+            navigator.serviceWorker.getRegistrations().then(regs => {
+                for (let reg of regs) reg.unregister();
+            });
         }
     </script>
 </body>
