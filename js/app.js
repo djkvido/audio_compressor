@@ -83,12 +83,12 @@ function setupEventListeners() {
 
         if (e.code === 'Space') {
             e.preventDefault();
-            // Přehrát aktivní
-            if (audioElements.original && !audioElements.original.paused) {
-                togglePlayback('original');
-            } else if (audioElements.processed) {
-                togglePlayback('processed');
+            // Přehrát aktivní podle A/B přepínače (pokud existuje)
+            // Fix: Respektujeme aktuální stav A/B i po pauze
+            if (audioElements[currentAB]) {
+                togglePlayback(currentAB);
             } else if (audioElements.original) {
+                // Fallback, kdyby náhodou
                 togglePlayback('original');
             }
         } else if (e.code === 'ArrowLeft') {
