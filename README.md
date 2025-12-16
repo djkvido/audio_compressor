@@ -1,39 +1,30 @@
-# Audio Studio 🎵
+# Audio (Alpha) 🚧
 
-Profesionální webová aplikace pro úpravu a analýzu audia. Spojuje dva výkonné nástroje v jednom moderním rozhraní.
+Webová aplikace pro úpravu a analýzu audia.
+**Upozornění:** Projekt je ve fázi vývoje a testování (Alpha verze). Může obsahovat chyby.
 
 ## 🌟 Funkce
 
 ### 1. Audio Kompresor 📊
-Hlavní nástroj pro normalizaci a čištění nahrávek.
+Nástroj pro normalizaci a úpravu hlasitosti.
 - **Analýza:** Detekce RMS, Peak a dynamického rozsahu.
-- **Chytré zpracování:** Automatická normalizace hlasitosti (LUFS/RMS) a limiter proti clippingu.
-- **Batch Processing:** Hromadné zpracování více souborů najednou (ZIP export).
-- **Vizuální kontrola:** Detailní waveform s vyznačením problémových míst.
+- **Zpracování:** Normalizace a limiter.
+- **Batch Processing:** Hromadné zpracování souborů.
 
 ### 2. Time-Stretch (Hall Edit) ⏩
-Nástroj pro změnu rychlosti hudby bez deformace hlasu (pitch-shifting).
-- **Technologie:** Využívá knihovnu **SoundTouchJS** pro vysoce kvalitní zpracování v reálném čase.
-- **Využití:** Ideální pro zrychlení/zpomalení podkladů pro vystoupení.
-- **A/B Porovnání:** Okamžitý poslech originálu vs. upravené verze.
+Experimentální nástroj pro změnu rychlosti hudby.
+- **Technologie:** Využívá `SoundTouchJS` pro změnu tempa.
+- **Využití:** Zrychlení/zpomalení nahrávek.
 
 ## 🛠️ Technologie
-- **Frontend:** Vanilla JavaScript, HTML5, CSS3 (Modern Glassmorphism Design).
-- **Audio Core:** Web Audio API.
-- **Knihovny:**
-  - `SoundTouchJS` (Time-Stretch algoritmus).
-  - `LameJS` (MP3 encoding).
-  - `JSZip` (Batch processing).
+- **Frontend:** Vanilla JavaScript, HTML5, CSS3.
+- **Audio:** Web Audio API.
 
-## 📝 Nedávné změny (Log)
-- **Odstranění PWA:** Zrušena PWA funkcionalita (Service Workers, manifest) ve prospěch čisté webové aplikace.
-- **Nový Branding:** Sjednocení designu ("Audio Kompresor" & "Time-Stretch"), odstranění marketingových textů.
-- **Cross-Promotion:** Implementace chytrých prolinků mezi nástroji.
-- **UX Vylepšení:** Odstranění potvrzovacích oken při opuštění stránky a fix UI prvků.
+## 📝 Poznámky k vývoji
+- **Status:** Testování funkčnosti a UI.
+- **Změny:** Odstraněna PWA podpora, zjednodušen UI design.
 
 ## 🚀 Použití
-Aplikace běží kompletně ve vašem prohlížeči (Client-Side). Neodesílá žádná data na server.
-- **Online:** Stačí otevřít webovou stránku (např. na GitHub Pages).
-- **Prohlížeč:** Doporučujeme nejnovější Chrome, Edge nebo Firefox pro nejlepší kompatibilitu s Web Audio API.
+Aplikace běží v prohlížeči (Client-Side). Neodesílá data na server.
+- **Status:** Work in Progress. Funkčnost není garantována ve všech prohlížečích.
 
-Žádná instalace není potřeba. Stačí otevřít a používat.
