@@ -355,14 +355,25 @@ function handleABToggle() {
 
     if (originalPlaying) {
         // Hraje originál -> přepnout na upravené
-        switchToAudio('processed', audioElements.original.currentTime);
+        // Chrome fix: Ensure we pass current time safely
+        const time = audioElements.original ? audioElements.original.currentTime : 0;
+        switchToAudio('processed', time);
     } else if (processedPlaying) {
         // Hraje upravené -> přepnout na originál
-        switchToAudio('original', audioElements.processed.currentTime);
+        const time = audioElements.processed ? audioElements.processed.currentTime : 0;
+        switchToAudio('original', time);
     } else {
         // Nic nehraje - jen přepneme "přepínač"
+        // Toggle logic: if 'original', switch to 'processed', else 'original'
         const newType = currentAB === 'original' ? 'processed' : 'original';
         updateABVisuals(newType);
+
+        // Pokud existuje audio pro nový typ a jsme 'paused', nastavíme mu čas toho druhého
+        // (aby při play začal tam kde jsme skončili)
+        const oldType = newType === 'original' ? 'processed' : 'original';
+        if (audioElements[oldType] && audioElements[newType]) {
+            audioElements[newType].currentTime = audioElements[oldType].currentTime;
+        }
     }
 }
 
