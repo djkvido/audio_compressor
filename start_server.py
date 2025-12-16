@@ -9,12 +9,22 @@ PORT = 8000
 
 class Handler(http.server.SimpleHTTPRequestHandler):
     def end_headers(self):
-        # Cache politiku nastavíme na 'no-cache', aby browser věděl, 
-        # že si má změny kontrolovat (304 Not Modified), ale necachoval agresivně staré verze.
-        # Hard 'no-store' byl overkill a zbytečně to pak lagovalo.
+        # Force aggressive anti-caching
+        self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+        self.send_header('Pragma', 'no-cache')
+        self.send_header('Expires', '0')
         
-        # Tady by se daly vynutit MIME typy, kdyby browser dělal drahoty s JS soubory.
-        # Zatím to necháme na automatice.
+        # Force correct MIME types for Windows (Chrome is strict about application/javascript)
+        path = self.path.lower()
+        if path.endswith('.js') or path.endswith('.mjs'):
+            self.send_header('Content-Type', 'application/javascript')
+        elif path.endswith('.css'):
+            self.send_header('Content-Type', 'text/css')
+        elif path.endswith('.json'):
+            self.send_header('Content-Type', 'application/json')
+        elif path.endswith('.svg'):
+            self.send_header('Content-Type', 'image/svg+xml')
+            
         super().end_headers()
 
 class ReusableTCPServer(socketserver.TCPServer):
