@@ -115,26 +115,18 @@ function setupEventListeners() {
         }
     });
 
-    // Obsluha klávesnice (mezerník = play/pause, šipky = posun)
+    // Obsluha klávesnice (mezerník = play/pause)
     document.addEventListener('keydown', e => {
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
         if (e.code === 'Space') {
             e.preventDefault();
             // Přehrát aktivní podle A/B přepínače (pokud existuje)
-            // Fix: Respektujeme aktuální stav A/B i po pauze
             if (audioElements[currentAB]) {
                 togglePlayback(currentAB);
             } else if (audioElements.original) {
-                // Fallback, kdyby náhodou
                 togglePlayback('original');
             }
-        } else if (e.code === 'ArrowLeft') {
-            e.preventDefault();
-            seekRelative(-5);
-        } else if (e.code === 'ArrowRight') {
-            e.preventDefault();
-            seekRelative(5);
         }
     });
 
