@@ -46,7 +46,6 @@ let analysisCard, settingsCard, resultCard;
 let batchListCard, batchProcessActions;
 
 // ============ Startujeme ============
-// ============ Startujeme ============
 function init() {
     try {
         console.log("App initializing...");
@@ -311,7 +310,6 @@ function setupEventListeners() {
             langMenu.classList.add('hidden');
         };
 
-        initLanguage();
         const currentLang = localStorage.getItem('audioStudioLang') || 'en';
         updateLanguageUI(currentLang);
     }
@@ -379,7 +377,6 @@ function handlePresetChange() {
     }
 }
 
-// A/B Testování - aby si uživatel mohl rychle porovnat změnu (při přehrávání)
 // A/B Testování - aby si uživatel mohl rychle porovnat změnu (při přehrávání)
 let currentAB = 'original'; // Výchozí stav (shoduje se s HTML)
 

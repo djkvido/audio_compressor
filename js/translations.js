@@ -50,8 +50,6 @@ const translations = {
 
         fadeIn: "Fade In",
         fadeOut: "Fade Out",
-        fadeIn: "Fade In",
-        fadeOut: "Fade Out",
         seconds: "s",
         size: "Velikost",
 
@@ -72,7 +70,6 @@ const translations = {
 
         abHint: "Klikni pro přepnutí Originál ↔ Upraveno",
 
-        backBtn: "Upravit nastavení",
         backBtn: "Upravit nastavení",
         downloadBtn: "Stáhnout", // Fallback
         downloadBtnMp3: "Stáhnout MP3",
@@ -107,8 +104,6 @@ const translations = {
         // Warnings
         clipping: "Přebuzení/clipping",
         tooQuiet: "Velmi tiché",
-        noProblems: "Skvělé! Nebyly nalezeny žádné zásadní problémy s hlasitostí.",
-        problemsFound: "Nalezené problémy",
         noProblems: "Skvělé! Nebyly nalezeny žádné zásadní problémy s hlasitostí.",
         problemsFound: "Nalezené problémy",
         andXMore: "... a {x} dalších",
@@ -216,8 +211,6 @@ const translations = {
         limiter: "Limiter",
         limiterCeiling: "Ceiling (dB)",
 
-        fadeIn: "Fade In",
-        fadeOut: "Fade Out",
         fadeIn: "Fade In",
         fadeOut: "Fade Out",
         seconds: "s",
@@ -383,8 +376,6 @@ const translations = {
 
         fadeIn: "Fade In",
         fadeOut: "Fade Out",
-        fadeIn: "Fade In",
-        fadeOut: "Fade Out",
         seconds: "s",
         size: "Größe",
 
@@ -547,8 +538,6 @@ const translations = {
         limiter: "Limiter",
         limiterCeiling: "Ceiling (dB)",
 
-        fadeIn: "Fade In",
-        fadeOut: "Fade Out",
         fadeIn: "Fade In",
         fadeOut: "Fade Out",
         seconds: "s",

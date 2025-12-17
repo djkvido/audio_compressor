@@ -768,13 +768,6 @@ h1 {
     border-color: var(--accent);
 }
 
-.actions {
-    display: flex;
-    gap: 0.75rem;
-    justify-content: center;
-    margin-top: 1.5rem;
-}
-
 /* ============ Processing Overlay ============ */
 .processing-overlay {
     display: none;
