@@ -570,20 +570,75 @@ function seekOnProgressBar(e, type) {
 }
 
 // === A/B Toggle ===
+// Map a playback time between original and result using the duration ratio
+// so A/B switching always lands on the MUSICALLY EQUIVALENT moment
+// (same passage of the song), regardless of tempo change.
+function mapEquivalentTime(fromType, fromTime) {
+    const originalDur = state.originalAudioData ? state.originalAudioData.duration : 0;
+    const resultDur = state.resultAudioData ? state.resultAudioData.duration : 0;
+    if (!originalDur || !resultDur) return fromTime;
+
+    if (fromType === 'original') {
+        // Original -> Result: scale by resultDur / originalDur
+        return fromTime * (resultDur / originalDur);
+    } else {
+        // Result -> Original
+        return fromTime * (originalDur / resultDur);
+    }
+}
+
 function handleABToggle() {
     const originalPlaying = audioElements.original && !audioElements.original.paused;
     const resultPlaying = audioElements.result && !audioElements.result.paused;
 
     if (originalPlaying) {
         const time = audioElements.original.currentTime;
-        switchToAudio('result', time);
+        switchToAudio('result', mapEquivalentTime('original', time));
     } else if (resultPlaying) {
         const time = audioElements.result.currentTime;
-        switchToAudio('original', time);
+        switchToAudio('original', mapEquivalentTime('result', time));
     } else {
-        const newType = currentAB === 'original' ? 'result' : 'original';
-        updateABVisuals(newType);
-        currentAB = newType;
+        // Not playing — also map the paused position so that hitting play
+        // after the switch resumes at the same musical spot.
+        const sourceType = currentAB;
+        const targetType = currentAB === 'original' ? 'result' : 'original';
+        const sourceAudio = audioElements[sourceType];
+        const mappedTime = sourceAudio
+            ? mapEquivalentTime(sourceType, sourceAudio.currentTime || 0)
+            : 0;
+
+        // Prepare target audio element with the mapped time
+        if (!audioElements[targetType]) {
+            const url = targetType === 'original' ? state.originalAudioUrl : state.resultAudioUrl;
+            if (url) {
+                audioElements[targetType] = new Audio(url);
+                audioElements[targetType].addEventListener('ended', () => {
+                    updatePlayIcon(targetType, false);
+                    clearInterval(playbackIntervals[targetType]);
+                    updateProgressBar(targetType, 0);
+                    clearAllWaveformPlayheads(targetType);
+                });
+            }
+        }
+        const targetAudio = audioElements[targetType];
+        if (targetAudio) {
+            const applyTime = () => {
+                try { targetAudio.currentTime = mappedTime; } catch (_) {}
+                const dur = targetAudio.duration || 0;
+                const ratio = dur > 0 ? mappedTime / dur : 0;
+                updateProgressBar(targetType, ratio);
+                updateTimeDisplay(targetType, mappedTime, dur);
+                updateAllWaveformPlayheads(targetType, ratio);
+            };
+            if (targetAudio.readyState >= 1) {
+                applyTime();
+            } else {
+                targetAudio.addEventListener('loadedmetadata', applyTime, { once: true });
+            }
+        }
+
+        updateABVisuals(targetType);
+        currentAB = targetType;
     }
 }
 
