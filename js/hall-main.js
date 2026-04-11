@@ -847,10 +847,13 @@ async function encodeMP3(channels, length, sampleRate, onProgress) {
     const rightPCM = new Int16Array(length);
 
     for (let i = 0; i < length; i++) {
-        // TPDF dither – sjednoceno s audio-worker.js (symetrický rozsah)
-        const dither = (Math.random() - 0.5 + Math.random() - 0.5) / 32767.5;
-        leftPCM[i] = Math.max(-32768, Math.min(32767, Math.round(left[i] * 32767 + dither)));
-        rightPCM[i] = Math.max(-32768, Math.min(32767, Math.round(right[i] * 32767 + dither)));
+        // TPDF dither – sjednoceno s audio-worker.js (symetrický rozsah).
+        // FIX (v16): Nezávislý dither per kanál — sdílený random() mezi L/R
+        // produkoval korelovaný kvantizační šum přilepený doprostřed stereo obrazu.
+        const ditherL = (Math.random() - 0.5 + Math.random() - 0.5) / 32767.5;
+        const ditherR = (Math.random() - 0.5 + Math.random() - 0.5) / 32767.5;
+        leftPCM[i] = Math.max(-32768, Math.min(32767, Math.round(left[i] * 32767 + ditherL)));
+        rightPCM[i] = Math.max(-32768, Math.min(32767, Math.round(right[i] * 32767 + ditherR)));
     }
 
     const mp3encoder = new lamejs.Mp3Encoder(numChannels, sampleRate, kbps);

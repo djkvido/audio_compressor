@@ -91,13 +91,18 @@ function analyzeAudio(channels, sampleRate, length) {
 
     // Clipping detekce podle sample peaku na krátkých oknech (0.5s) – rychlejší
     // než plný true peak scan per okno, a clipping je sample-accurate phenomenon.
+    // FIX: scanujeme VŠECHNY kanály (ne jen channels[0]) — clipping v pravém kanálu
+    // by jinak zůstal nedetekovaný u stereo souborů s asymetrickým mixem.
     const clipWin = Math.floor(sampleRate * 0.5);
     for (let start = 0; start < length; start += clipWin) {
         const end = Math.min(start + clipWin, length);
         let winPeak = 0;
-        for (let i = start; i < end; i++) {
-            const abs = Math.abs(channelData[i]);
-            if (abs > winPeak) winPeak = abs;
+        for (let ch = 0; ch < channels.length; ch++) {
+            const data = channels[ch];
+            for (let i = start; i < end; i++) {
+                const abs = Math.abs(data[i]);
+                if (abs > winPeak) winPeak = abs;
+            }
         }
         const winPeakDb = winPeak > 0 ? 20 * Math.log10(winPeak) : -Infinity;
         if (winPeakDb > -1) {
@@ -319,6 +324,8 @@ function applySmartLeveler(channels, length, sampleRate, settings) {
 
     // Pokud jsme nedostali žádnou short-term hodnotu (track kratší než 400 ms
     // nebo samé ticho), padneme zpět na jednoduchý single-gain leveler.
+    // FIX: žádný hard clip na ±1.0 — limiter pod tímto krokem nastaví správný
+    // ceiling. Hard clip v tomhle fallbacku by mu znemožnil vynutit -1 dBTP.
     if (!shortTerm || shortTerm.length === 0 || !isFinite(integratedLufs)) {
         const deltaDb = isFinite(integratedLufs) ? (targetLufs - integratedLufs) : 0;
         const clampedDb = Math.max(-maxAttenuationDb, Math.min(maxBoostDb, deltaDb));
@@ -327,8 +334,8 @@ function applySmartLeveler(channels, length, sampleRate, settings) {
             const data = channels[ch];
             for (let i = 0; i < length; i++) {
                 let v = data[i] * gain;
-                if (v > 1.0) v = 1.0; else if (v < -1.0) v = -1.0;
-                data[i] = isFinite(v) ? v : 0;
+                if (!isFinite(v)) v = 0;
+                data[i] = v;
             }
         }
         return;
@@ -410,11 +417,6 @@ function applyTruePeakLimiter(channels, length, sampleRate, ceilingDb) {
     const attackCoeff = Math.exp(-1.0 / (sampleRate * 0.0005));  // 0.5 ms
     const releaseCoeff = Math.exp(-1.0 / (sampleRate * 0.050));  // 50 ms
 
-    // FIX: předpočítané konstanty pro soft knee (byly v inner loop!)
-    const kneeDb = ceilingDb - 6.0;
-    const threshold = Math.pow(10, kneeDb / 20);
-    const headroom = ceiling - threshold;  // rozsah pro tanh saturaci
-
     const requiredGain = new Float32Array(length).fill(1.0);
 
     // 1. Průchod: kde nám to přelézá přes strop? Nastavíme requiredGain s look-ahead oknem.
@@ -436,7 +438,20 @@ function applyTruePeakLimiter(channels, length, sampleRate, ceilingDb) {
         }
     }
 
-    // 2. Aplikace gain reduction + soft clipper
+    // 2. Aplikace gain reduction + hard clip jako safety net
+    //
+    // FIX (v16): Odstraněna tanh soft-knee saturace. Math je tato:
+    //   kneeDb = ceilingDb - 6, tj. threshold = 0.447 * ceiling_linear.
+    //   Pro sample, který po gain reduction dosáhne přesně ceilingu,
+    //   tanh((ceiling-threshold)/headroom) = tanh(1) = 0.7616,
+    //   takže output = threshold + 0.7616 * headroom ≈ 0.785 * ceiling.
+    //   V dB to znamená -1.88 dB undershoot pod požadovaný strop — uživatel
+    //   nastaví -1 dBTP ceiling a dostane -2.88 dBFS. Nedržíme slib.
+    //
+    //   Gain reduction smyčka výše + exponenciální attack/release už dělá
+    //   smooth compression. Hard clip zůstává jako absolutní safety pro
+    //   případ, že by interpolace true-peaku (4× oversampling) podcenila
+    //   inter-sample peak.
     let currentGain = 1.0;
     for (let i = 0; i < length; i++) {
         const targetGain = requiredGain[i];
@@ -447,13 +462,6 @@ function applyTruePeakLimiter(channels, length, sampleRate, ceilingDb) {
 
         for (let ch = 0; ch < numChannels; ch++) {
             let val = channels[ch][i] * currentGain;
-
-            // Soft knee: tanh saturace 6 dB pod stropem
-            if (val > threshold) {
-                val = threshold + headroom * Math.tanh((val - threshold) / headroom);
-            } else if (val < -threshold) {
-                val = -(threshold + headroom * Math.tanh((-val - threshold) / headroom));
-            }
 
             // Absolutní pojistka
             if (val > ceiling) val = ceiling;
@@ -516,10 +524,14 @@ async function encodeMP3(channels, length, sampleRate, onProgress) {
 
     // Převod float32 → int16 s dithering (triangular noise pro maskování kvantizačního zkreslení)
     // FIX: dělitel 32767.5 místo 32768 – symetrický rozsah pro TPDF dither
+    // FIX (v16): Nezávislý dither per kanál — sdílený random() mezi L/R způsobil
+    // korelovaný šum v centrálním obrazu stereo mixu (subjektivně slyšitelné
+    // jako "šum přilepený doprostřed"). Teď je dither dekorelovaný.
     for (let i = 0; i < length; i++) {
-        const dither = (Math.random() - 0.5 + Math.random() - 0.5) / 32767.5;
-        leftPCM[i] = Math.max(-32768, Math.min(32767, Math.round(left[i] * 32767 + dither)));
-        rightPCM[i] = Math.max(-32768, Math.min(32767, Math.round(right[i] * 32767 + dither)));
+        const ditherL = (Math.random() - 0.5 + Math.random() - 0.5) / 32767.5;
+        const ditherR = (Math.random() - 0.5 + Math.random() - 0.5) / 32767.5;
+        leftPCM[i] = Math.max(-32768, Math.min(32767, Math.round(left[i] * 32767 + ditherL)));
+        rightPCM[i] = Math.max(-32768, Math.min(32767, Math.round(right[i] * 32767 + ditherR)));
     }
 
     const mp3encoder = new lamejs.Mp3Encoder(numChannels, sampleRate, kbps);

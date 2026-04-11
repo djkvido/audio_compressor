@@ -113,14 +113,20 @@ export function validateAudioBuffer(audioBuffer) {
         };
     }
 
-    // Peak scan přes první kanál (rychlé – nejen pro detekci ticha, ale i klipů)
-    // Používáme decimaci: stačí sampleovat každý 8. vzorek pro detekci.
-    const data = audioBuffer.getChannelData(0);
+    // Peak scan přes VŠECHNY kanály (pro detekci ticha i klipů).
+    // FIX (v16): Dřív se scanoval jen channel 0. Soubor, kde je levý kanál ticho
+    // a pravý obsahuje signál (vzácný, ale reálný — např. rozhlasové vložky
+    // s monoramickým mikrofonem na jednom kanálu), by byl chybně zamítnut jako ticho.
+    // Používáme decimaci: stačí sampleovat každý N-tý vzorek.
     let peak = 0;
-    const stride = Math.max(1, Math.floor(data.length / 200000)); // Max ~200k kontrol
-    for (let i = 0; i < data.length; i += stride) {
-        const v = Math.abs(data[i]);
-        if (isFinite(v) && v > peak) peak = v;
+    const firstChannel = audioBuffer.getChannelData(0);
+    const stride = Math.max(1, Math.floor(firstChannel.length / 200000)); // Max ~200k kontrol/kanál
+    for (let ch = 0; ch < audioBuffer.numberOfChannels; ch++) {
+        const data = audioBuffer.getChannelData(ch);
+        for (let i = 0; i < data.length; i += stride) {
+            const v = Math.abs(data[i]);
+            if (isFinite(v) && v > peak) peak = v;
+        }
     }
 
     const peakDb = peak > 0 ? 20 * Math.log10(peak) : -Infinity;
