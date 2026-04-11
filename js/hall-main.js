@@ -1,9 +1,10 @@
 // ============ Time-Stretch Studio - Hall Edit ============
-// Uses SoundTouchJS - professional C++ SoundTouch library port
+// Uses SoundTouchJS - C++ SoundTouch library port (bundled locally)
 
 // Import translations
 import { t, setLanguage, initLanguage, currentLanguage } from './translations.js';
 import { validateAudioFile, validateAudioBuffer, validateStretchRatio } from './audio-validation.js';
+import { SoundTouch, SimpleFilter } from './lib/soundtouch.js';
 
 // === State ===
 const state = {
@@ -14,7 +15,6 @@ const state = {
     resultAudioUrl: null,
     resultBlob: null,
     audioContext: null,
-    soundTouch: null,
     warningShown: false
 };
 
@@ -55,14 +55,6 @@ async function init() {
     initLanguage();
     updateUITranslations();
     setupLanguageDropdown();
-
-    // Load SoundTouch library dynamically
-    try {
-        const module = await import('https://cdn.jsdelivr.net/npm/soundtouchjs@0.1.30/dist/soundtouch.js');
-        state.soundTouch = module;
-    } catch (err) {
-        console.warn('SoundTouch failed to load, using fallback algorithm:', err);
-    }
 
     // Setup event listeners
     setupEventListeners();
@@ -280,17 +272,9 @@ async function processAudio() {
         updateProgress(10);
         await sleep(10);
 
-        let stretchedData;
-
-        if (state.soundTouch) {
-            stretchedData = await soundTouchStretch(left, right, tempo, sampleRate, (progress) => {
-                updateProgress(10 + progress * 60);
-            });
-        } else {
-            stretchedData = await fallbackStretch(left, right, tempo, sampleRate, (progress) => {
-                updateProgress(10 + progress * 60);
-            });
-        }
+        const stretchedData = await soundTouchStretch(left, right, tempo, sampleRate, numChannels, (progress) => {
+            updateProgress(10 + progress * 60);
+        });
 
         updateProgress(70);
         await sleep(10);
@@ -712,33 +696,54 @@ function switchTab(tabName) {
 }
 
 // === SoundTouch Time-Stretch ===
-async function soundTouchStretch(leftChannel, rightChannel, tempo, sampleRate, onProgress) {
-    const { SoundTouch, SimpleFilter } = state.soundTouch;
-
+// Uses WSOLA/SOLA algorithm from SoundTouchJS which preserves pitch
+// while changing tempo — no "chipmunk" artifacts.
+async function soundTouchStretch(leftChannel, rightChannel, tempo, sampleRate, numChannels, onProgress) {
     const inputLength = leftChannel.length;
     const outputLength = Math.round(inputLength / tempo);
 
+    // SoundTouch expects stereo interleaved input. We always feed stereo
+    // (mono is duplicated into both channels) and SoundTouch handles it.
     const st = new SoundTouch();
+    // Set sample rate on the internal Stretch (default is 44100 — must match
+    // source otherwise the SOLA window sizing is off and creates artifacts).
+    st.stretch.setParameters(sampleRate, 0, 0, 0);
     st.tempo = tempo;
     st.pitch = 1.0;
 
+    // Input source — interleaved stereo samples. We add a silent tail of
+    // ~32k frames after the real audio so SoundTouch's internal 16k-frame
+    // input buffer gets fully drained and the last real samples get processed
+    // (otherwise the last ~10% of output would be silently dropped).
+    const silentTail = 32768;
     const source = {
         position: 0,
         extract: function (target, numFrames) {
-            const available = Math.min(numFrames, leftChannel.length - this.position);
-            for (let i = 0; i < available; i++) {
-                target[i * 2] = leftChannel[this.position + i];
-                target[i * 2 + 1] = rightChannel[this.position + i];
+            let i = 0;
+            // Real samples
+            while (i < numFrames && this.position < leftChannel.length) {
+                target[i * 2] = leftChannel[this.position];
+                target[i * 2 + 1] = rightChannel[this.position];
+                this.position++;
+                i++;
             }
-            this.position += available;
-            return available;
+            // Silent padding
+            while (i < numFrames && this.position < leftChannel.length + silentTail) {
+                target[i * 2] = 0;
+                target[i * 2 + 1] = 0;
+                this.position++;
+                i++;
+            }
+            return i;
         }
     };
 
     const filter = new SimpleFilter(source, st);
 
-    const outputLeft = new Float32Array(outputLength + 10000);
-    const outputRight = new Float32Array(outputLength + 10000);
+    // Overallocate a little to absorb latency/ramp-up samples at start/end
+    const capacity = outputLength + 32768;
+    const outputLeft = new Float32Array(capacity);
+    const outputRight = new Float32Array(capacity);
 
     const chunkSize = 4096;
     const buffer = new Float32Array(chunkSize * 2);
@@ -749,82 +754,31 @@ async function soundTouchStretch(leftChannel, rightChannel, tempo, sampleRate, o
         const framesRead = filter.extract(buffer, chunkSize);
         if (framesRead === 0) break;
 
-        for (let i = 0; i < framesRead; i++) {
-            if (outputPos + i < outputLeft.length) {
-                outputLeft[outputPos + i] = buffer[i * 2];
-                outputRight[outputPos + i] = buffer[i * 2 + 1];
-            }
+        const writable = Math.min(framesRead, capacity - outputPos);
+        for (let i = 0; i < writable; i++) {
+            outputLeft[outputPos + i] = buffer[i * 2];
+            outputRight[outputPos + i] = buffer[i * 2 + 1];
         }
+        outputPos += writable;
 
-        outputPos += framesRead;
+        if (outputPos >= capacity) break; // safety
 
         const progress = Math.min(outputPos / outputLength, 1);
-        if (progress - lastProgress > 0.05) {
+        if (progress - lastProgress > 0.02) {
             lastProgress = progress;
             if (onProgress) onProgress(progress);
             await sleep(0);
         }
     }
 
-    return {
-        left: outputLeft.slice(0, outputPos),
-        right: outputRight.slice(0, outputPos)
-    };
-}
+    if (onProgress) onProgress(1);
 
-// === Fallback Stretch ===
-async function fallbackStretch(leftChannel, rightChannel, tempo, sampleRate, onProgress) {
-    const inputLength = leftChannel.length;
-    const outputLength = Math.round(inputLength / tempo);
+    // Trim to the theoretical output length (drops the silent-tail portion)
+    const finalLength = Math.min(outputPos, outputLength);
+    const left = outputLeft.slice(0, finalLength);
+    const right = numChannels > 1 ? outputRight.slice(0, finalLength) : left;
 
-    const fftSize = 4096;
-    const hopAnalysis = fftSize / 4;
-    const hopSynthesis = Math.round(hopAnalysis / tempo);
-
-    const window = new Float32Array(fftSize);
-    for (let i = 0; i < fftSize; i++) {
-        window[i] = 0.5 * (1 - Math.cos(2 * Math.PI * i / (fftSize - 1)));
-    }
-
-    const outputLeft = new Float32Array(outputLength);
-    const outputRight = new Float32Array(outputLength);
-    const overlapAdd = new Float32Array(outputLength);
-
-    let inputPos = 0;
-    let outputPos = 0;
-    let frameCount = 0;
-
-    while (outputPos < outputLength - fftSize && inputPos < inputLength - fftSize) {
-        for (let i = 0; i < fftSize; i++) {
-            const inputIdx = inputPos + i;
-            const outputIdx = outputPos + i;
-
-            if (inputIdx < inputLength && outputIdx < outputLength) {
-                outputLeft[outputIdx] += leftChannel[inputIdx] * window[i];
-                outputRight[outputIdx] += rightChannel[inputIdx] * window[i];
-                overlapAdd[outputIdx] += window[i];
-            }
-        }
-
-        inputPos += hopAnalysis;
-        outputPos += hopSynthesis;
-        frameCount++;
-
-        if (frameCount % 50 === 0) {
-            const progress = inputPos / inputLength;
-            if (onProgress) onProgress(Math.min(progress, 1));
-            await sleep(0);
-        }
-    }
-
-    for (let i = 0; i < outputLength; i++) {
-        if (overlapAdd[i] > 0.01) {
-            outputLeft[i] /= overlapAdd[i];
-            outputRight[i] /= overlapAdd[i];
-        }
-    }
-
-    return { left: outputLeft, right: outputRight };
+    return { left, right };
 }
 
 // === MP3 Encoding ===
@@ -1019,10 +973,10 @@ function updateUITranslations() {
         pl: 'Polski'
     };
     const flagUrls = {
-        cs: 'https://flagcdn.com/24x18/cz.png',
-        en: 'https://flagcdn.com/24x18/gb.png',
-        de: 'https://flagcdn.com/24x18/de.png',
-        pl: 'https://flagcdn.com/24x18/pl.png'
+        cs: 'assets/flags/cz.png',
+        en: 'assets/flags/gb.png',
+        de: 'assets/flags/de.png',
+        pl: 'assets/flags/pl.png'
     };
 
     const currentLangLabel = document.getElementById('currentLangLabel');

@@ -1,5 +1,5 @@
-importScripts('https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js');
-importScripts('./lufs-meter.js?v=14');
+importScripts('./lib/lame.min.js');
+importScripts('./lufs-meter.js?v=15');
 
 // Main Thread Listener
 self.onmessage = async function (e) {

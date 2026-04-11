@@ -372,10 +372,10 @@ function updateLanguageUI(lang) {
     };
 
     const flagUrls = {
-        'cs': 'https://flagcdn.com/24x18/cz.png',
-        'en': 'https://flagcdn.com/24x18/gb.png',
-        'de': 'https://flagcdn.com/24x18/de.png',
-        'pl': 'https://flagcdn.com/24x18/pl.png'
+        'cs': 'assets/flags/cz.png',
+        'en': 'assets/flags/gb.png',
+        'de': 'assets/flags/de.png',
+        'pl': 'assets/flags/pl.png'
     };
 
     const label = document.getElementById('currentLangLabel');

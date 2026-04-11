@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Time-Stretch Studio | Kvido Production</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="assets/fonts/fonts.css" rel="stylesheet">
     <link rel="icon" type="image/svg+xml" href="assets/icon.svg">
     <link rel="stylesheet" href="css/styles.css">
 </head>
@@ -339,7 +339,7 @@
     <footer>
         <div class="language-dropdown" id="languageDropdown">
             <button class="lang-btn" id="langBtn" aria-expanded="false" data-i18n-title="titleChangeLang">
-                <img src="https://flagcdn.com/24x18/cz.png" alt="CS" class="flag-icon" id="currentFlag">
+                <img src="assets/flags/cz.png" alt="CS" class="flag-icon" id="currentFlag">
                 <span id="currentLangLabel">Čeština</span>
                 <svg class="chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -348,19 +348,19 @@
             </button>
             <div class="lang-menu hidden" id="langMenu">
                 <div class="lang-item" data-value="cs">
-                    <img src="https://flagcdn.com/24x18/cz.png" alt="CS" class="flag-icon">
+                    <img src="assets/flags/cz.png" alt="CS" class="flag-icon">
                     <span>Čeština</span>
                 </div>
                 <div class="lang-item" data-value="en">
-                    <img src="https://flagcdn.com/24x18/gb.png" alt="EN" class="flag-icon">
+                    <img src="assets/flags/gb.png" alt="EN" class="flag-icon">
                     <span>English</span>
                 </div>
                 <div class="lang-item" data-value="de">
-                    <img src="https://flagcdn.com/24x18/de.png" alt="DE" class="flag-icon">
+                    <img src="assets/flags/de.png" alt="DE" class="flag-icon">
                     <span>Deutsch</span>
                 </div>
                 <div class="lang-item" data-value="pl">
-                    <img src="https://flagcdn.com/24x18/pl.png" alt="PL" class="flag-icon">
+                    <img src="assets/flags/pl.png" alt="PL" class="flag-icon">
                     <span>Polski</span>
                 </div>
             </div>
@@ -368,11 +368,11 @@
         <p><span data-i18n="footerText">Zpracování probíhá v prohlížeči, soubory se nikam neodesílají</span></p>
     </footer>
 
-    <!-- CDN Libraries -->
-    <script src="https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js"></script>
+    <!-- Local Libraries -->
+    <script src="js/lib/lame.min.js"></script>
 
-    <!-- Main Application (ES Module for dynamic import) -->
-    <script type="module" src="js/hall-main.js?v=14"></script>
+    <!-- Main Application (ES Module) -->
+    <script type="module" src="js/hall-main.js?v=15"></script>
 </body>
 
 </html>
