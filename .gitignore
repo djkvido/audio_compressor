@@ -1,0 +1,21 @@
+# Python Virtual Env
+venv/
+.venv/
+env/
+.env
+
+# System
+.DS_Store
+__pycache__/
+*.pyc
+
+# Backups/Archives
+bck/
+*.rar
+*.zip
+*.7z
+
+# User's specifics
+aaaavenv/
+processed_audio/
+*.log
