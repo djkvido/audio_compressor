@@ -15,7 +15,7 @@ const translations = {
         promoBtn: "Otevřít",
 
         // Promo Back (Main)
-        promoBackTitle: "Profesionální analýza a normalizace audia",
+        promoBackTitle: "Analýza a normalizace audia",
         promoBackBtn: "Otevřít",
 
         // App Titles
@@ -214,7 +214,7 @@ const translations = {
         promoBtn: "Open",
 
         // Promo Back (Main)
-        promoBackTitle: "Professional Audio Analysis & Normalization",
+        promoBackTitle: "Audio Analysis & Normalization",
         promoBackBtn: "Open",
 
         // App Titles
@@ -412,7 +412,7 @@ const translations = {
         promoBtn: "Öffnen",
 
         // Promo Back (Main)
-        promoBackTitle: "Professionelle Audio-Analyse & Normalisierung",
+        promoBackTitle: "Audio-Analyse & Normalisierung",
         promoBackBtn: "Öffnen",
 
         // App Titles
@@ -611,7 +611,7 @@ const translations = {
         promoBtn: "Otwórz",
 
         // Promo Back (Main)
-        promoBackTitle: "Profesjonalna analiza i normalizacja dźwięku",
+        promoBackTitle: "Analiza i normalizacja dźwięku",
         promoBackBtn: "Otwórz",
 
         // App Titles
