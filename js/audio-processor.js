@@ -66,7 +66,7 @@ export async function processAudio(state, onComplete) {
         }
 
         // Worker s verzí pro cache busting (fixní verze místo Date.now() = stabilnější)
-        const worker = new Worker('js/audio-worker.js?v=14');
+        const worker = new Worker('js/audio-worker.js?v=16');
 
         const updateProgress = (percent, textOrKey) => {
             const fill = $('progressFill');
@@ -101,7 +101,15 @@ export async function processAudio(state, onComplete) {
             settings
         }, transferList);
 
-        const result = await workerPromise;
+        // FIX: worker.terminate() v try/finally – když worker selže nebo se
+        // dekódování výsledku vyhodí chybou, worker thread musí být taky uklizen.
+        let result;
+        try {
+            result = await workerPromise;
+        } catch (err) {
+            worker.terminate();
+            throw err;
+        }
         worker.terminate();
 
         state.processedBlob = result.blob;

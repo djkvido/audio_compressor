@@ -1,5 +1,5 @@
 importScripts('./lib/lame.min.js');
-importScripts('./lufs-meter.js?v=15');
+importScripts('./lufs-meter.js?v=16');
 
 // Main Thread Listener
 self.onmessage = async function (e) {
@@ -388,8 +388,10 @@ function applySmartLeveler(channels, length, sampleRate, settings) {
 
         for (let ch = 0; ch < numChannels; ch++) {
             let val = channels[ch][i] * gain;
-            if (val > 1.0) val = 1.0;
-            else if (val < -1.0) val = -1.0;
+            // FIX: žádný hard clip na ±1.0 zde. Limiter pod tímto krokem
+            // vynutí správný ceiling (typicky -1 dBTP = 0.891). Hard clip by
+            // „odřízl" peak ještě než se k němu limiter dostane a limiter
+            // by pak nedokázal ceiling pod 1.0 vynutit.
             if (!isFinite(val)) val = 0;
             channels[ch][i] = val;
         }
@@ -463,31 +465,41 @@ function applyTruePeakLimiter(channels, length, sampleRate, ceilingDb) {
 }
 
 // Fade In (sinus křivka – přirozený nástup)
+// FIX: Pokud je fadeInTime delší než samotné audio, použijeme jako denominátor
+// clamp loopLen (reálnou délku fade) místo originálního fadeInSamples — jinak
+// by sinus nikdy nedosáhl unity gainu (1.0) a na konci fade by audio bylo tišší.
 function applyFadeIn(channels, length, sampleRate, fadeInTime) {
     const numChannels = channels.length;
     const fadeInSamples = Math.floor(fadeInTime * sampleRate);
     const loopLen = Math.min(fadeInSamples, length);
+    if (loopLen <= 0) return;
     const piHalf = Math.PI / 2;
+    const denom = loopLen; // vždy kompletní čtvrtperioda sinu v rámci dostupné délky
 
     for (let ch = 0; ch < numChannels; ch++) {
         const data = channels[ch];
         for (let i = 0; i < loopLen; i++) {
-            data[i] *= Math.sin((i / fadeInSamples) * piHalf);
+            data[i] *= Math.sin((i / denom) * piHalf);
         }
     }
 }
 
 // Fade Out (sinus křivka – přirozené doznění)
+// FIX: totéž jako fade-in — zamezíme tomu, aby při fadeOutTime > délka audia
+// poslední vzorek končil někde uprostřed sinu místo v 0.
 function applyFadeOut(channels, length, sampleRate, fadeOutTime) {
     const numChannels = channels.length;
     const fadeOutSamples = Math.floor(fadeOutTime * sampleRate);
-    const fadeOutStart = Math.max(0, length - fadeOutSamples);
+    const loopLen = Math.min(fadeOutSamples, length);
+    if (loopLen <= 0) return;
+    const fadeOutStart = length - loopLen;
     const piHalf = Math.PI / 2;
+    const denom = loopLen;
 
     for (let ch = 0; ch < numChannels; ch++) {
         const data = channels[ch];
         for (let i = fadeOutStart; i < length; i++) {
-            data[i] *= Math.sin(((length - i) / fadeOutSamples) * piHalf);
+            data[i] *= Math.sin(((length - i) / denom) * piHalf);
         }
     }
 }

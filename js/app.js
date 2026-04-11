@@ -104,8 +104,13 @@ function setupEventListeners() {
         e.preventDefault();
         uploadZone.classList.add('dragover');
     });
-    uploadZone.addEventListener('dragleave', () => {
-        uploadZone.classList.remove('dragover');
+    // FIX: dragleave bubblá z vnořených elementů (SVG ikona, <p>, <button>),
+    // takže bez kontroly relatedTargetu vizuální highlight flickeruje, kdykoliv
+    // kurzor přejede přes potomka. Ignorujeme leave, který je jen dovnitř zóny.
+    uploadZone.addEventListener('dragleave', e => {
+        if (!uploadZone.contains(e.relatedTarget)) {
+            uploadZone.classList.remove('dragover');
+        }
     });
     uploadZone.addEventListener('drop', e => {
         e.preventDefault();
@@ -759,10 +764,10 @@ async function analyzeOriginal(file) {
         state.originalAudioData = audioBuffer;
 
         // Spuštění analýzy ve workeru
-        // FIX (v14): Posíláme VŠECHNY kanály – worker teď počítá stereo korelaci
+        // FIX (v16): Posíláme VŠECHNY kanály – worker teď počítá stereo korelaci
         // (detekce mono/fázových problémů) a loudness range. Bez druhého kanálu
         // bychom to nedetekovali.
-        const worker = new Worker('js/audio-worker.js?v=14');
+        const worker = new Worker('js/audio-worker.js?v=16');
         const analyzeChannels = [];
         for (let i = 0; i < audioBuffer.numberOfChannels; i++) {
             analyzeChannels.push(audioBuffer.getChannelData(i));
@@ -775,18 +780,23 @@ async function analyzeOriginal(file) {
             length: audioBuffer.length
         });
 
-        const analysis = await new Promise((resolve, reject) => {
-            worker.onmessage = (e) => {
-                if (e.data.type === 'analysisComplete') {
-                    resolve(e.data.analysis);
-                } else if (e.data.type === 'error') {
-                    reject(new Error(e.data.error));
-                }
-            };
-            worker.onerror = (err) => reject(err);
-        });
-
-        worker.terminate();
+        let analysis;
+        try {
+            analysis = await new Promise((resolve, reject) => {
+                worker.onmessage = (e) => {
+                    if (e.data.type === 'analysisComplete') {
+                        resolve(e.data.analysis);
+                    } else if (e.data.type === 'error') {
+                        reject(new Error(e.data.error));
+                    }
+                };
+                worker.onerror = (err) => reject(err);
+            });
+        } finally {
+            // FIX: terminate i při erroru – jinak by worker thread zůstal viset
+            // a postupně akumuloval paměť při opakovaných chybných souborech.
+            worker.terminate();
+        }
 
         state.originalAnalysis = analysis;
 
